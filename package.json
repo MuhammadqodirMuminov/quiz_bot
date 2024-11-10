@@ -1,0 +1,19 @@
+{
+  "name": "quiz-bot",
+  "version": "1.0.0",
+  "description": "This bot is for teacher who is create test online and send to students",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "node-telegram-bot-api": "^0.66.0",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "@types/node-telegram-bot-api": "^0.64.7"
+  }
+}
