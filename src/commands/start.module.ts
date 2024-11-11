@@ -16,7 +16,11 @@ class StartModule {
 	}
 
 	setCommands() {
-		this.bot.setMyCommands([{ command: '/start', description: 'Start the bot' }]);
+		this.bot.setMyCommands([
+			{ command: '/start', description: 'Start the bot' },
+			{ command: '/admin', description: 'Admins approved' },
+			{ command: '/help', description: 'Bot helps and sitemaps' },
+		]);
 	}
 
 	init() {
