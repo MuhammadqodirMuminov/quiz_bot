@@ -1,5 +1,5 @@
 import { run } from './config/database.config';
-import initModule from './modules/init.module';
+import initModule from './commands/init.module';
 
 // configure
 run();
