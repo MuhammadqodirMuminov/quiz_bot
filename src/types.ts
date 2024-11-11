@@ -3,3 +3,10 @@ export interface IResponse<T = null> {
 	data?: T;
 	success?: boolean;
 }
+
+export enum FileTypes {
+	IMAGE = 'IMAGE',
+	VIDEO = 'VIDEO',
+	DOCUMENT = 'DOCUMENT',
+    AUDIO = 'AUDIO',
+}
