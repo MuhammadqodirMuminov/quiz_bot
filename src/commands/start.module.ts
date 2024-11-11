@@ -1,5 +1,7 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { bot } from '../config/bot.config';
+import userService from '../services/user.service';
+import { mp } from '../utils';
 
 class StartModule {
 	private bot: TelegramBot;
@@ -11,7 +13,10 @@ class StartModule {
 	private start() {
 		this.bot.onText(/\/start/, async msg => {
 			const chatId = msg.chat.id;
-			this.bot.sendMessage(chatId, 'HI!');
+
+			await userService.create({ chat_id: chatId, username: msg.chat.username, date_of_join: new Date() });
+
+			this.bot.sendMessage(chatId, 'Hello! I am Quiz Bot. Type /help for more info.', { reply_markup: mp.userMenu });
 		});
 	}
 

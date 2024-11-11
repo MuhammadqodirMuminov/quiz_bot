@@ -1,3 +1,5 @@
+import TelegramBot from 'node-telegram-bot-api';
+
 export const adminMenu = {
 	keyboard: [[{ text: '/stat' }], [{ text: '/test' }, { text: '/mail_users' }], [{ text: '/subscription' }, { text: '/ads' }]],
 	resize_keyboard: true,
@@ -25,13 +27,19 @@ export const testInlineButton = {
 };
 
 export const cancelMail = {
-	keyboard: [
-		[{ text: 'cancel_mail' }]
-	]
-}
+	keyboard: [[{ text: 'cancel_mail' }]],
+	resize_keyboard: true,
+	one_time_keyboard: false,
+};
 
 export const cancelAndPushMail = {
-	keyboard: [
-		[{ text: 'cancel_mail' }, { text: 'push_mail' }]
-	]
-}
+	keyboard: [[{ text: 'cancel_mail' }, { text: 'push_mail' }]],
+	resize_keyboard: true,
+	one_time_keyboard: false,
+};
+
+export const userMenu: TelegramBot.SendMessageOptions['reply_markup'] = {
+	keyboard: [[{ text: '/checkAnswers' }, { text: '/stat' }]],
+	resize_keyboard: true,
+	one_time_keyboard: false,
+};

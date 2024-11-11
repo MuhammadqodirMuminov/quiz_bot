@@ -1,11 +1,11 @@
+import fs from 'fs';
 import TelegramBot from 'node-telegram-bot-api';
+import path from 'path';
 import { bot } from '../config/bot.config';
 import { ADMIN_PASS } from '../config/environment.config';
 import { ms } from '../constants';
 import adminService from '../services/admin.service';
 import { extractUniqueCode, mp } from '../utils';
-import path from 'path';
-import fs from 'fs';
 import userModule from './user.module';
 
 class AdminmModule {
@@ -15,7 +15,7 @@ class AdminmModule {
 	}
 
 	admin() {
-		this.bot.onText(/\/(admin|admin_menu)/, async (msg) => {
+		this.bot.onText(/\/(admin|admin_menu)/, async msg => {
 			const chatId = msg.chat.id;
 			const username = msg.from?.username;
 			try {
@@ -41,7 +41,7 @@ class AdminmModule {
 	}
 
 	async stat() {
-		this.bot.onText(/\/stat/, async (msg) => {
+		this.bot.onText(/\/stat/, async msg => {
 			const chatId = msg.chat.id;
 			try {
 				// const { success } = await adminService.isAdmin(chatId);
@@ -77,13 +77,14 @@ class AdminmModule {
 	}
 
 	private async mail_users() {
-		this.bot.onText(/\/mail_users/, async (msg) => {
+		this.bot.onText(/\/mail_users/, async msg => {
 			const chatId = msg.chat.id;
 			const { success } = await adminService.isAdmin(chatId);
 			const messageContent = {};
 
 			if (!success) {
-				bot.sendMessage(chatId, ms.notAdmin, { parse_mode: 'Markdown' });
+				await bot.sendMessage(chatId, ms.notAdmin, { parse_mode: 'Markdown' });
+				return;
 			}
 
 			const replyMsg = await this.bot.sendMessage(chatId, ms.mailUsersMsg, {
@@ -95,10 +96,7 @@ class AdminmModule {
 		});
 	}
 
-	private async add_media_to_mail(
-		msg: TelegramBot.Message,
-		messageContent: any
-	) {
+	private async add_media_to_mail(msg: TelegramBot.Message, messageContent: any) {
 		const chatId = msg.chat.id;
 		try {
 			const { success } = await adminService.isAdmin(chatId);
@@ -110,11 +108,7 @@ class AdminmModule {
 				this.admin_options(chatId, msg.chat.username as string);
 			} else {
 				messageContent['text'] = msg.text;
-				const replyMsg = await this.bot.sendMessage(
-					chatId,
-					"Attach media - 1\nDon't attach media - 0",
-					{ reply_markup: mp.cancelMail, parse_mode: 'Markdown' }
-				);
+				const replyMsg = await this.bot.sendMessage(chatId, "Attach media - 1\nDon't attach media - 0", { reply_markup: mp.cancelMail, parse_mode: 'Markdown' });
 				await this.mail_users_send(replyMsg, messageContent);
 			}
 		} catch (error: any) {
@@ -140,18 +134,11 @@ class AdminmModule {
 					parse_mode: 'HTML',
 					reply_markup: mp.cancelAndPushMail,
 				});
-				const replyMsg = await this.bot.sendMessage(
-					chatId,
-					'Press push to send, cancel to cancel',
-					{ parse_mode: 'HTML' }
-				);
+				const replyMsg = await this.bot.sendMessage(chatId, 'Press push to send, cancel to cancel', { parse_mode: 'HTML' });
 				await this.confirm_mail(replyMsg, messageContent);
 			} else if (msg.text === '1') {
 				messageContent['status'] = 'mail';
-				const replyMsg = await this.bot.sendMessage(
-					chatId,
-					'Attach file\n\n.jpg .jpeg .mp4'
-				);
+				const replyMsg = await this.bot.sendMessage(chatId, 'Attach file\n\n.jpg .jpeg .mp4');
 				this.handler_file(replyMsg, messageContent);
 			}
 		} catch (error: any) {
@@ -169,12 +156,7 @@ class AdminmModule {
 			} else if (msg.text === 'push') {
 				const media = fs.createReadStream(messageContent['src']);
 
-				userModule.sendAllUser(
-					chatId,
-					messageContent['text'],
-					media,
-					messageContent['media_type']
-				);
+				userModule.sendAllUser(chatId, messageContent['text'], media, messageContent['media_type']);
 			}
 		} catch (error: any) {
 			await this.bot.sendMessage(chatId, error.message, {
