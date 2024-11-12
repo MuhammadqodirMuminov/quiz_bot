@@ -1,4 +1,4 @@
-import TelegramBot from 'node-telegram-bot-api';
+import TelegramBot, { SendMessageOptions } from 'node-telegram-bot-api';
 import { bot } from '../config/bot.config';
 import userService from '../services/user.service';
 import { ReadStream } from 'fs';
@@ -15,7 +15,7 @@ class UserModule {
 	async sendAllUser(
 		adminChatId: number,
 		text: string,
-		media: ReadStream,
+		media: string,
 		mediaType: string
 	) {
 		const users = await userService.getAll({});

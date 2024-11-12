@@ -1,4 +1,4 @@
-import TelegramBot from 'node-telegram-bot-api';
+import TelegramBot, { SendMessageOptions } from 'node-telegram-bot-api';
 
 export const adminMenu = {
 	keyboard: [
@@ -22,13 +22,23 @@ export const testSaveMenu = {
 	one_time_keyboard: false,
 };
 
-export const testInlineButton = {
+export const testInlineButton = (
+	code: number
+): SendMessageOptions['reply_markup'] => ({
 	remove_keyboard: true,
 	selective: true,
-	inline_keyboard: [[{ text: 'send', callback_data: 'clicked' }]],
+	inline_keyboard: [
+		[{ text: 'send', callback_data: `send_test_${code}` }],
+		[
+			{
+				text: '❌ delete test',
+				callback_data: `edit_test_${code}`,
+			},
+		],
+	],
 	resize_keyboard: true,
 	one_time_keyboard: false,
-};
+});
 
 export const cancelMail = {
 	keyboard: [[{ text: 'cancel_mail' }]],
