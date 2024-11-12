@@ -1,9 +1,8 @@
 export const notAdmin = 'account is not admin';
 
-export const mailUsersMsg =
-	'Write text in the MARKDOWN markup or click cancel_mail';
+export const mailUsersMsg = 'Write text in the MARKDOWN markup or click cancel_mail';
 
-  // export const 
+// export const
 export const testHomeMessage = `Choose your test or create new One!`;
 
 export const test = {
@@ -38,4 +37,44 @@ Let’s see who the real space experts are! 🌌 Good luck, and may the best ans
 - **Test Name:** ${name}
 - **Count of Questions:** ${count}
 ---`,
+	notFound: `Test code is not found. Please check again!`,
+	wrongCount: `Test answers is less than count of questions`,
+	wrongAnswer: `Test answers is wrong. Please check again!`,
 };
+
+export const checkAnswers = `
+	👇👇👇 Yo'riqnoma.
+
+1️⃣ Test javoblarini yuborish uchun 
+
+test kodi*abbccdd... 
+yoki
+test kodi*1a2d3c4a5b...
+
+kabi ko'rinishlarda yuboring
+
+Misol: 
+1234*abbccdd
+yoki
+1234*1a2d3c4a5b
+`;
+
+export const testResult = (testNomi: string, trueAnswersCount: number, falseAnswersCount: number, falseAnswers: { index: number; answer: string }[]): string => {
+	return `
+# Test Result for "${testNomi}"
+
+- **Correct Answers:** ${trueAnswersCount}
+- **Incorrect Answers:** ${falseAnswersCount}
+
+## Incorrect Answers Details
+${falseAnswers.length > 0 ? falseAnswers.map(fa => `- **Question ${fa.index + 1}**: Your answer: ${fa.answer}`).join('\n') : 'No incorrect answers!'}
+  `;
+};
+
+// Example usage:
+const result = testResult('Sample Test', 8, 2, [
+	{ index: 1, answer: 'B' },
+	{ index: 3, answer: 'D' },
+]);
+
+console.log(result);

@@ -1,9 +1,12 @@
 import TelegramBot, { SendMessageOptions } from 'node-telegram-bot-api';
 import { bot } from '../config/bot.config';
+import { ms } from '../constants';
+import { testResult } from '../constants/messages';
+import resultsService from '../services/results.service';
+import testService from '../services/test.service';
 import userService from '../services/user.service';
-import { ReadStream } from 'fs';
 import { FileTypes } from '../types';
-import { mp } from '../utils';
+import { countMatchingAnswers, extractNumberAndString, mp } from '../utils';
 
 class UserModule {
 	private bot: TelegramBot;
@@ -12,12 +15,75 @@ class UserModule {
 		this.bot = bot;
 	}
 
-	async sendAllUser(
-		adminChatId: number,
-		text: string,
-		media: string,
-		mediaType: string
-	) {
+	checkAnswers() {
+		this.bot.onText(/\/checkAnswers/, async msg => {
+			const chatId = msg.chat.id;
+			bot.sendMessage(chatId, ms.checkAnswers, { reply_markup: { remove_keyboard: true } }).then(() => {
+				this.handleResult();
+			});
+		});
+	}
+	private handleResult() {
+		this.bot.once('message', async msg => {
+			const chatId = msg.chat.id;
+			const answers = msg.text;
+
+			const results = extractNumberAndString(answers!);
+
+			if (results) {
+				const test = await testService.getOne({ code: results.number });
+
+				if (!test) {
+					await bot.sendMessage(chatId, ms.test.notFound, { reply_markup: mp.userMenu });
+					return;
+				}
+
+				if (test && test.isPublished === false) {
+					await bot.sendMessage(chatId, ms.test.notFound, { reply_markup: mp.userMenu });
+					return;
+				}
+
+				if (results.pattern.length !== test.count) {
+					await bot.sendMessage(chatId, ms.test.wrongCount, { reply_markup: mp.userMenu });
+					return;
+				}
+
+				const user = await userService.getOne({ chat_id: chatId });
+
+				const checkedAnswers = countMatchingAnswers(results.pattern, test.answers);
+
+				const existresult = await resultsService.getOne({ user: user, test });
+
+				if (existresult) {
+					await resultsService.update(
+						{ user: user, test: test },
+						{
+							score: checkedAnswers.correctMatches,
+						}
+					);
+				} else {
+					await resultsService.create({
+						user: user,
+						test: test,
+						atteps: [
+							{
+								score: checkedAnswers.correctMatches,
+							},
+						],
+					});
+				}
+				await this.bot.sendMessage(chatId, testResult(test.name, checkedAnswers.correctMatches, checkedAnswers.wrongAnswers.length, checkedAnswers.wrongAnswers), {
+					reply_markup: mp.userMenu,
+					parse_mode: 'Markdown',
+				});
+			} else {
+				await bot.sendMessage(chatId, ms.checkAnswers, { reply_markup: mp.userMenu });
+				return;
+			}
+		});
+	}
+
+	async sendAllUser(adminChatId: number, text: string, media: string, mediaType: string) {
 		const users = await userService.getAll({});
 		let sended = 0;
 		let unSended = 0;
@@ -55,13 +121,12 @@ class UserModule {
 			}
 		}
 
-		await this.bot.sendMessage(
-			adminChatId,
-			`Sent ${sended} \nNot Sent ${unSended}`,
-			{ parse_mode: 'Markdown', reply_markup: mp.adminMenu }
-		);
+		await this.bot.sendMessage(adminChatId, `Sent ${sended} \nNot Sent ${unSended}`, { parse_mode: 'Markdown', reply_markup: mp.adminMenu });
 	}
-	initModule() {}
+
+	init() {
+		this.checkAnswers();
+	}
 }
 
 export default new UserModule(bot);
