@@ -1,7 +1,11 @@
 import TelegramBot from 'node-telegram-bot-api';
 
 export const adminMenu = {
-	keyboard: [[{ text: '/stat' }], [{ text: '/test' }, { text: '/mail_users' }], [{ text: '/subscription' }, { text: '/ads' }]],
+	keyboard: [
+		[{ text: '/stat' }],
+		[{ text: '/test' }, { text: '/mail_users' }],
+		[{ text: '/subscription' }, { text: '/ads' }],
+	],
 	resize_keyboard: true,
 	one_time_keyboard: false,
 };
@@ -42,4 +46,9 @@ export const userMenu: TelegramBot.SendMessageOptions['reply_markup'] = {
 	keyboard: [[{ text: '/checkAnswers' }, { text: '/stat' }]],
 	resize_keyboard: true,
 	one_time_keyboard: false,
+};
+
+export const offMarkup: TelegramBot.SendMessageOptions['reply_markup'] = {
+	remove_keyboard: true,
+	selective: true,
 };

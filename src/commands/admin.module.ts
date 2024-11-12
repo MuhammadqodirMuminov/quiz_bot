@@ -7,15 +7,18 @@ import { ms } from '../constants';
 import adminService from '../services/admin.service';
 import { extractUniqueCode, mp } from '../utils';
 import userModule from './user.module';
+import { IFile } from '../models/file.schema';
+import { FileTypes } from '../types';
+import fileService from '../services/file.service';
 
-class AdminmModule {
+class AdminModule {
 	private bot: TelegramBot;
 	constructor(bot: TelegramBot) {
 		this.bot = bot;
 	}
 
 	admin() {
-		this.bot.onText(/\/(admin|admin_menu)/, async msg => {
+		this.bot.onText(/\/(admin|admin_menu)/, async (msg) => {
 			const chatId = msg.chat.id;
 			const username = msg.from?.username;
 			try {
@@ -41,7 +44,7 @@ class AdminmModule {
 	}
 
 	async stat() {
-		this.bot.onText(/\/stat/, async msg => {
+		this.bot.onText(/\/stat/, async (msg) => {
 			const chatId = msg.chat.id;
 			try {
 				// const { success } = await adminService.isAdmin(chatId);
@@ -70,149 +73,199 @@ class AdminmModule {
 	}
 
 	private async admin_options(chatId: number, username: string) {
-		await this.bot.sendMessage(chatId, `Admin : ${username}`, {
+		return await this.bot.sendMessage(chatId, `Admin : ${username}`, {
 			parse_mode: 'Markdown',
 			reply_markup: mp.adminMenu,
 		});
 	}
 
 	private async mail_users() {
-		this.bot.onText(/\/mail_users/, async msg => {
+		this.bot.onText(/\/mail_users/, async (msg) => {
 			const chatId = msg.chat.id;
 			const { success } = await adminService.isAdmin(chatId);
 			const messageContent = {};
 
 			if (!success) {
-				await bot.sendMessage(chatId, ms.notAdmin, { parse_mode: 'Markdown' });
-				return;
+				return await bot.sendMessage(chatId, ms.notAdmin, {
+					parse_mode: 'Markdown',
+				});
 			}
 
-			const replyMsg = await this.bot.sendMessage(chatId, ms.mailUsersMsg, {
-				parse_mode: 'Markdown',
-				reply_markup: mp.cancelMail,
-			});
-
-			await this.add_media_to_mail(replyMsg, messageContent);
+			this.bot
+				.sendMessage(chatId, ms.mailUsersMsg, {
+					reply_markup: mp.cancelMail,
+				})
+				.then(() => {
+					this.add_media_to_mail(messageContent);
+				});
 		});
 	}
 
-	private async add_media_to_mail(msg: TelegramBot.Message, messageContent: any) {
-		const chatId = msg.chat.id;
-		try {
-			const { success } = await adminService.isAdmin(chatId);
-			if (!success) {
-				await this.admin_options(chatId, msg.chat.username || '');
-			}
+	private async add_media_to_mail(messageContent: any) {
+		this.bot.once('message', async (msg) => {
+			const chatId = msg.chat.id;
 
-			if (msg.text === 'cancel_mail') {
-				this.admin_options(chatId, msg.chat.username as string);
-			} else {
-				messageContent['text'] = msg.text;
-				const replyMsg = await this.bot.sendMessage(chatId, "Attach media - 1\nDon't attach media - 0", { reply_markup: mp.cancelMail, parse_mode: 'Markdown' });
-				await this.mail_users_send(replyMsg, messageContent);
-			}
-		} catch (error: any) {
-			await this.bot.sendMessage(chatId, `Error: ${error?.message}`, {
-				parse_mode: 'Markdown',
-			});
-		}
-	}
-
-	private async mail_users_send(msg: TelegramBot.Message, messageContent: any) {
-		const chatId = msg.chat.id;
-		try {
-			const { success } = await adminService.isAdmin(chatId);
-			if (!success) {
-				await this.admin_options(chatId, msg.chat.username || '');
-			}
-
-			if (msg.text === 'cancel_mail') {
-				await this.admin_options(chatId, msg.chat.username || '');
-			} else if (msg.text === '0') {
-				messageContent['status'] = '';
-				await this.bot.sendMessage(chatId, messageContent['text'], {
-					parse_mode: 'HTML',
-					reply_markup: mp.cancelAndPushMail,
-				});
-				const replyMsg = await this.bot.sendMessage(chatId, 'Press push to send, cancel to cancel', { parse_mode: 'HTML' });
-				await this.confirm_mail(replyMsg, messageContent);
-			} else if (msg.text === '1') {
-				messageContent['status'] = 'mail';
-				const replyMsg = await this.bot.sendMessage(chatId, 'Attach file\n\n.jpg .jpeg .mp4');
-				this.handler_file(replyMsg, messageContent);
-			}
-		} catch (error: any) {
-			await this.bot.sendMessage(chatId, error.message, {
-				parse_mode: 'Markdown',
-			});
-		}
-	}
-
-	private async confirm_mail(msg: TelegramBot.Message, messageContent: any) {
-		const chatId = msg.chat.id;
-		try {
-			if (msg.text == 'cancel_mail') {
-				await this.admin_options(chatId, msg.chat.username || '');
-			} else if (msg.text === 'push') {
-				const media = fs.createReadStream(messageContent['src']);
-
-				userModule.sendAllUser(chatId, messageContent['text'], media, messageContent['media_type']);
-			}
-		} catch (error: any) {
-			await this.bot.sendMessage(chatId, error.message, {
-				parse_mode: 'Markdown',
-			});
-		}
-	}
-
-	async handler_file(msg: TelegramBot.Message, messageContent: any) {
-		const chatId = msg.chat.id;
-
-		try {
-			const { success } = await adminService.isAdmin(chatId);
-			if (success) {
-				const dir = path.join(__dirname, 'files', String(chatId));
-				fs.mkdirSync(dir, { recursive: true });
-
-				if (messageContent.status === 'mail') {
-					if (msg.photo) {
-						const fileId = msg.photo[msg.photo.length - 1].file_id;
-						const fileLink = await this.bot.getFileLink(fileId);
-						const response = await (await fetch(fileLink)).arrayBuffer();
-						const filePath = path.join(process.env.AD_PWD!, 'mail.jpg');
-						4;
-						fs.writeFileSync(filePath, Buffer.from(response));
-						messageContent.src = filePath;
-						messageContent.media_type = 'jpg';
-
-						bot.sendMessage(chatId, 'Image loaded');
-						bot.sendPhoto(chatId, filePath, { caption: messageContent.text });
-					}
-
-					if (msg.video) {
-						const fileId = msg.video.file_id;
-						const fileLink = await bot.getFileLink(fileId);
-						const response = await (await fetch(fileLink)).arrayBuffer();
-						const filePath = path.join(process.env.AD_PWD!, 'mail.mp4');
-
-						fs.writeFileSync(filePath, Buffer.from(response));
-						messageContent.src = filePath;
-						messageContent.media_type = 'mp4';
-
-						bot.sendMessage(chatId, 'Video uploaded');
-						bot.sendVideo(chatId, filePath, { caption: messageContent.text });
-					}
-
-					bot.sendMessage(chatId, 'Press push to send, cancel to cancel');
-					// Register next step handler logic here if needed
-				} else {
-					console.log('Other status handling');
-					// Handle other statuses similarly
+			try {
+				const { success } = await adminService.isAdmin(chatId);
+				if (!success) {
+					return await this.admin_options(chatId, msg.chat.username || '');
 				}
+
+				if (msg.text === 'cancel_mail') {
+					return await this.admin_options(chatId, msg.chat.username as string);
+				} else {
+					messageContent['text'] = msg.text;
+
+					this.bot
+						.sendMessage(chatId, "Attach media - 1\nDon't attach media - 0", {
+							reply_markup: mp.cancelMail,
+							parse_mode: 'Markdown',
+						})
+						.then(() => {
+							this.mail_users_send(messageContent);
+						});
+				}
+			} catch (error: any) {
+				await this.bot.sendMessage(chatId, `Error: ${error?.message}`, {
+					parse_mode: 'Markdown',
+				});
 			}
-		} catch (error) {
-			console.error('Error processing file:', error);
-		}
+		});
+	}
+
+	private async mail_users_send(messageContent: any) {
+		this.bot.once('message', async (msg) => {
+			const chatId = msg.chat.id;
+
+			try {
+				const { success } = await adminService.isAdmin(chatId);
+				if (!success) {
+					await this.admin_options(chatId, msg.chat.username || '');
+				}
+
+				if (msg.text === 'cancel_mail') {
+					await this.admin_options(chatId, msg.chat.username || '');
+				} else if (msg.text === '0') {
+					messageContent['status'] = '';
+					await this.bot.sendMessage(chatId, messageContent['text'], {
+						parse_mode: 'HTML',
+						reply_markup: mp.cancelAndPushMail,
+					});
+					await this.bot
+						.sendMessage(chatId, 'Press push to send, cancel to cancel', {
+							parse_mode: 'HTML',
+							reply_markup: mp.cancelAndPushMail,
+						})
+						.then(() => this.confirm_mail(messageContent));
+				} else if (msg.text === '1') {
+					messageContent['status'] = 'mail';
+					await this.bot
+						.sendMessage(chatId, 'Attach file\n\n.jpg .jpeg .mp4')
+						.then(() => {
+							this.handler_file(messageContent);
+						});
+				}
+			} catch (error: any) {
+				await this.bot.sendMessage(chatId, error.message, {
+					parse_mode: 'Markdown',
+				});
+			}
+		});
+	}
+
+	private async confirm_mail(messageContent: any) {
+		this.bot.once('message', async (msg) => {
+			const chatId = msg.chat.id;
+
+			try {
+				if (msg.text == 'cancel_mail') {
+					return await this.admin_options(chatId, msg.chat.username || '');
+				} else if (msg.text === 'push_mail') {
+					const media = messageContent['src'];
+
+					userModule.sendAllUser(
+						chatId,
+						messageContent['text'],
+						media,
+						messageContent['media_type']
+					);
+				}
+			} catch (error: any) {
+				await this.bot.sendMessage(chatId, error.message);
+			}
+		});
+	}
+
+	async handler_file(messageContent: any) {
+		this.bot.once('message', async (msg) => {
+			const chatId = msg.chat.id;
+
+			try {
+				const { success } = await adminService.isAdmin(chatId);
+
+				if (success) {
+					let image: IFile | undefined = undefined;
+					const fileId = msg.photo?.at(-1)?.file_id;
+					const documentFileId = msg.document?.file_id;
+					const videoId = msg.video?.file_id;
+
+					if (fileId) {
+						image = await fileService.createFile({
+							fileType: FileTypes.IMAGE,
+							fileId,
+						});
+					} else if (documentFileId) {
+						image = await fileService.createFile({
+							fileType: FileTypes.DOCUMENT,
+							fileId: documentFileId,
+						});
+						messageContent['media_type'] = FileTypes.DOCUMENT;
+					} else if (videoId) {
+						image = await fileService.createFile({
+							fileType: FileTypes.VIDEO,
+							fileId: videoId,
+						});
+						messageContent['media_type'] = 'mp4';
+					}
+
+					if (messageContent.status === 'mail') {
+						if (msg.photo) {
+							await bot.sendPhoto(chatId, image?.fileId!, {
+								caption: messageContent.text,
+							});
+						}
+
+						if (msg.video) {
+							await bot.sendMessage(chatId, 'Video uploaded');
+							await bot.sendVideo(chatId, image?.fileId!, {
+								caption: messageContent.text,
+								reply_markup: mp.offMarkup,
+							});
+						}
+
+						if (msg.document) {
+							await bot.sendMessage(chatId, 'Document uploaded');
+							await bot.sendDocument(chatId, image?.fileId!, {
+								caption: messageContent.text,
+								reply_markup: mp.offMarkup,
+							});
+						}
+
+						messageContent['src'] = image?.fileId;
+						bot
+							.sendMessage(chatId, 'Press push to send, cancel to cancel', {
+								reply_markup: mp.cancelAndPushMail,
+								parse_mode: 'HTML',
+							})
+							.then(() => this.confirm_mail(messageContent));
+					} else {
+						console.log('Other status handling');
+					}
+				}
+			} catch (error) {
+				console.error('Error processing file:', error);
+			}
+		});
 	}
 
 	init() {
@@ -222,4 +275,4 @@ class AdminmModule {
 	}
 }
 
-export default new AdminmModule(bot);
+export default new AdminModule(bot);
