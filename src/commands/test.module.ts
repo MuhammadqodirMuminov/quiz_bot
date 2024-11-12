@@ -17,14 +17,14 @@ export class TestModule {
 	}
 
 	private test() {
-		this.bot.onText(/\/test/, async (msg) => {
+		this.bot.onText(/\/test/, async msg => {
 			const chatId = msg.chat.id;
 
 			try {
 				const { success } = await adminService.isAdmin(chatId);
 
 				if (success) {
-					this.testOptions(chatId).then((_) => {
+					this.testOptions(chatId).then(_ => {
 						this.handleName();
 					});
 				} else {
@@ -41,7 +41,7 @@ export class TestModule {
 	}
 
 	private async handleName() {
-		this.bot.once('message', async (msg) => {
+		this.bot.once('message', async msg => {
 			const chatId = msg.chat.id;
 			const text = msg.text?.trim();
 
@@ -59,7 +59,7 @@ export class TestModule {
 					const tests = await testService.getAll();
 
 					await Promise.all(
-						tests.map(async (test) => {
+						tests.map(async test => {
 							this.sendImageOrDocument(test, chatId, () => {}, {
 								parse_mode: 'Markdown',
 								reply_markup: mp.testInlineButton(test.code),
@@ -68,18 +68,16 @@ export class TestModule {
 						})
 					);
 
-					await this.bot
-						.sendMessage(chatId, ms.testHomeMessage, {
-							reply_markup: mp.adminMenu,
-						})
-						.then(() => this.sendTest());
+					await this.bot.sendMessage(chatId, ms.testHomeMessage, {
+						reply_markup: mp.adminMenu,
+					});
 				}
 			}
 		});
 	}
 
-	private async sendTest() {
-		this.bot.on('callback_query', async (msg) => {
+	async sendTest() {
+		this.bot.on('callback_query', async msg => {
 			const data = msg.data;
 			const chatId = msg.message?.chat.id;
 			if (data && chatId) {
@@ -87,32 +85,23 @@ export class TestModule {
 				const existTest = await testService.getOne({ code: code });
 
 				if (existTest && data.startsWith('send_test_')) {
-					userModule.sendAllUser(
-						chatId,
-						ms.test.card(existTest.code, existTest.name, existTest.count),
-						existTest.image.fileId!,
-						''
-					);
+					userModule.sendAllUser(chatId, ms.test.card(existTest.code, existTest.name, existTest.count), existTest.image.fileId!, '');
 				}
 				if (existTest && data.startsWith('edit_test_')) {
 					await testService.update(String(existTest._id), {
 						isPublished: !existTest.isPublished,
 					});
 					this.bot.deleteMessage(chatId, msg.message?.message_id!);
-					this.bot.sendMessage(
-						chatId,
-						`Test code: <code>${existTest.code}</code>\n<p>Test successfully deleted!</p>`,
-						{
-							parse_mode: 'HTML',
-						}
-					);
+					this.bot.sendMessage(chatId, `Test code: <code>${existTest.code}</code>\n<p>Test successfully deleted!</p>`, {
+						parse_mode: 'HTML',
+					});
 				}
 			}
 		});
 	}
 
 	private async createTest() {
-		this.bot.once('message', async (msg) => {
+		this.bot.once('message', async msg => {
 			const chatId = msg.chat.id;
 			const name = msg.text;
 
@@ -127,7 +116,7 @@ export class TestModule {
 	}
 
 	private handleText(code: number) {
-		this.bot.once('message', async (msg) => {
+		this.bot.once('message', async msg => {
 			const chatId = msg.chat.id;
 			const text = msg.text;
 
@@ -148,7 +137,7 @@ export class TestModule {
 	}
 
 	private handleImage(code: number) {
-		this.bot.once('message', async (msg) => {
+		this.bot.once('message', async msg => {
 			let image: IFile | undefined = undefined;
 			const chatId = msg.chat.id;
 			const fileId = msg.photo?.at(-1)?.file_id;
@@ -183,7 +172,7 @@ export class TestModule {
 	}
 
 	private handleAnswers(code: number) {
-		this.bot.once('message', async (msg) => {
+		this.bot.once('message', async msg => {
 			const chatId = msg.chat.id;
 
 			const answers = msg.text?.trim().toLowerCase();
@@ -205,11 +194,7 @@ export class TestModule {
 							this.handleSave(existTest.code);
 						},
 						{
-							caption: ms.test.card(
-								existTest.code,
-								existTest.name,
-								existTest.count
-							),
+							caption: ms.test.card(existTest.code, existTest.name, existTest.count),
 							parse_mode: 'Markdown',
 							reply_markup: mp.testSaveMenu,
 						}
@@ -220,7 +205,7 @@ export class TestModule {
 	}
 
 	private handleSave(code: number) {
-		this.bot.once('message', async (msg) => {
+		this.bot.once('message', async msg => {
 			const chatId = msg.chat.id;
 			const text = msg.text?.trim();
 
@@ -232,31 +217,18 @@ export class TestModule {
 				if (success) {
 					if (text == '/save') {
 						this.sendImageOrDocument(existTest, chatId, () => {}, {
-							caption: ms.test.card(
-								existTest.code,
-								existTest.name,
-								existTest.count
-							),
+							caption: ms.test.card(existTest.code, existTest.name, existTest.count),
 							parse_mode: 'Markdown',
 							reply_markup: mp.adminMenu,
 						});
 					} else if (text == '/saveAndSend') {
 						//send a this test to users and give starts and redirect to admin page
 						this.sendImageOrDocument(existTest, chatId, () => {}, {
-							caption: ms.test.card(
-								existTest.code,
-								existTest.name,
-								existTest.count
-							),
+							caption: ms.test.card(existTest.code, existTest.name, existTest.count),
 							parse_mode: 'Markdown',
 							reply_markup: mp.adminMenu,
 						});
-						userModule.sendAllUser(
-							chatId,
-							ms.test.card(existTest.code, existTest.name, existTest.count),
-							existTest.image.fileId!,
-							''
-						);
+						userModule.sendAllUser(chatId, ms.test.card(existTest.code, existTest.name, existTest.count), existTest.image.fileId!, '');
 					} else {
 						this.bot.sendMessage(chatId, 'Invalid command', {
 							parse_mode: 'Markdown',
@@ -268,12 +240,7 @@ export class TestModule {
 		});
 	}
 
-	private sendImageOrDocument(
-		existTest: ITest,
-		chatId: number,
-		cb: () => void,
-		options: TelegramBot.SendPhotoOptions
-	) {
+	private sendImageOrDocument(existTest: ITest, chatId: number, cb: () => void, options: TelegramBot.SendPhotoOptions) {
 		if (existTest.image.fileType === FileTypes.IMAGE) {
 			this.bot.sendPhoto(chatId, existTest.image.fileId, options).then(cb);
 		} else if (existTest.image.fileType === FileTypes.DOCUMENT) {
@@ -290,6 +257,7 @@ export class TestModule {
 
 	init() {
 		this.test();
+		this.sendTest();
 	}
 }
 
