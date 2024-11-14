@@ -1,5 +1,4 @@
 import { FilterQuery, Model, Types } from 'mongoose';
-import { IResponse } from '../types';
 import { IUser, userSchema } from '../models/user.schema';
 
 class UserService {

@@ -62,3 +62,26 @@ export const offMarkup: TelegramBot.SendMessageOptions['reply_markup'] = {
 	remove_keyboard: true,
 	selective: true,
 };
+
+export const adsMenu = {
+	keyboard: [
+		[{ text: '/create' }, { text: '/getAll' }],
+		[{ text: '/turnOff' }],
+		[{ text: '/admin' }],
+	],
+	resize_keyboard: true,
+	one_time_keyboard: false,
+};
+
+export const adsInlineButton = (
+	username: string
+): SendMessageOptions['reply_markup'] => ({
+	inline_keyboard: [
+		[
+			{
+				text: '❌ delete',
+				callback_data: `delete_ads_${username}`,
+			},
+		],
+	],
+});

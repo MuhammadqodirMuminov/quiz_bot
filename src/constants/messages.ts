@@ -77,4 +77,9 @@ const result = testResult('Sample Test', 8, 2, [
 	{ index: 3, answer: 'D' },
 ]);
 
+export const ads = {
+	homeMsg: `Choose your channels or create new One!`,
+	channelName: `Enter channel name for ads\n<code>@channel_name</code>`
+}
+
 console.log(result);
