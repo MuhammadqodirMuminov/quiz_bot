@@ -1,5 +1,5 @@
 import adminModule from './admin.module';
-import adsModule from './ads.module';
+import adsModule from './subscibe.module';
 import helpModule from './help.module';
 import startModule from './start.module';
 import testModule from './test.module';

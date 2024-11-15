@@ -1,9 +1,10 @@
 import TelegramBot from 'node-telegram-bot-api';
-import adminService from '../services/admin.service';
-import adsService from '../services/ads.service';
 import { bot } from '../config/bot.config';
 import { ms } from '../constants';
+import adminService from '../services/admin.service';
+import subscribeService from '../services/subscribe.service';
 import { mp } from '../utils';
+import adminModule from './admin.module';
 
 class AdsModule {
 	private bot: TelegramBot;
@@ -20,7 +21,7 @@ class AdsModule {
 
 				if (success) {
 					this.adsOptions(chatId).then(() => {
-						this.adsManage();
+						this.subscribeManage();
 					});
 				} else {
 					await this.bot.sendMessage(chatId, ms.notAdmin, {
@@ -35,7 +36,7 @@ class AdsModule {
 		});
 	}
 
-	private async adsManage() {
+	private async subscribeManage() {
 		this.bot.once('message', async (msg) => {
 			const chatId = msg.chat.id;
 			const text = msg.text?.trim();
@@ -48,23 +49,31 @@ class AdsModule {
 							parse_mode: 'HTML',
 							reply_markup: mp.offMarkup,
 						})
-						.then(() => this.adsCreate());
+						.then(() => this.subscribeCreate());
 				} else if (text === '/getAll') {
-					const ads = await adsService.getOne();
+					const ads = await subscribeService.getOne();
 
 					if (ads?.channels.length) {
 						for (const ad of ads?.channels) {
-							this.bot.sendMessage(chatId, `Channel: @${ad}`, {
-								parse_mode: 'HTML',
-								reply_markup: mp.adsInlineButton(ad),
-							});
+							this.bot
+								.sendMessage(chatId, `Channel: @${ad}`, {
+									parse_mode: 'HTML',
+									reply_markup: mp.subscribeInlineButton(ad),
+								})
+								.then(() =>
+									adminModule.admin_options(chatId, msg.from?.username || '')
+								);
 						}
 					} else {
-						this.bot.sendMessage(chatId, 'No ads channels!');
+						this.bot
+							.sendMessage(chatId, 'No subscribe channels!')
+							.then(() =>
+								adminModule.admin_options(chatId, msg.from?.username || '')
+							);
 					}
 				} else if (text === '/turnOff') {
-					await adsService.update([]);
-					this.bot.sendMessage(chatId, 'Ads turned off successfully');
+					await subscribeService.update([]);
+					this.bot.sendMessage(chatId, 'Subscribe turned off successfully');
 				}
 			} else {
 				return await this.bot.sendMessage(chatId, ms.notAdmin);
@@ -72,7 +81,7 @@ class AdsModule {
 		});
 	}
 
-	private async adsCreate() {
+	private async subscribeCreate() {
 		this.bot.once('message', async (msg) => {
 			const chatId = msg.chat.id;
 			const username = msg.text?.trim().split('@')[1];
@@ -80,24 +89,26 @@ class AdsModule {
 
 			if (success && username) {
 				try {
-					const isChannel = await this.bot.getChat(username);
-					console.log({ isChannel });
+					await this.bot.getChat(`@${username}`);
 
-					await adsService.create(username);
+					await subscribeService.create(username);
 					await bot
 						.sendMessage(chatId, 'New ads created successfully')
-						.then(() => this.adsOptions(chatId));
+						.then(() =>
+							adminModule.admin_options(chatId, msg.from?.username || '')
+						);
 				} catch (error: any) {
 					await this.bot
 						.sendMessage(chatId, `🚫 Error: Username @${username} not found`)
-						.then(() => this.adsCreate());
-					console.log({ error });
+						.then(() =>
+							adminModule.admin_options(chatId, msg.from?.username || '')
+						);
 				}
 			}
 		});
 	}
 
-	async deleteAd() {
+	async deleteSubscribe() {
 		this.bot.on('callback_query', async (msg) => {
 			const data = msg.data;
 			const chatId = msg.message?.chat.id;
@@ -105,11 +116,10 @@ class AdsModule {
 				try {
 					if (data && data.startsWith('delete_ads_')) {
 						const username = data.split('delete_ads_')[1];
-						const existAd = await adsService.getOne();
+						const existAd = await subscribeService.getOne();
 						const channels = existAd?.channels.filter((c) => c !== username);
-						console.log({ channels, username, existAd });
 
-						const updateAd = await adsService.update(channels);
+						const updateAd = await subscribeService.update(channels);
 
 						if (updateAd) {
 							this.bot.deleteMessage(chatId, msg.message?.message_id!);
@@ -128,13 +138,13 @@ class AdsModule {
 	private async adsOptions(chatId: number) {
 		await this.bot.sendMessage(chatId, ms.ads.homeMsg, {
 			parse_mode: 'Markdown',
-			reply_markup: mp.adsMenu,
+			reply_markup: mp.subscribeMenu,
 		});
 	}
 
 	init() {
 		this.subscribe();
-		this.deleteAd();
+		this.deleteSubscribe();
 	}
 }
 

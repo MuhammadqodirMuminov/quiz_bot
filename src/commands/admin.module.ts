@@ -72,7 +72,7 @@ class AdminModule {
 		});
 	}
 
-	private async admin_options(chatId: number, username: string) {
+	async admin_options(chatId: number, username: string) {
 		return await this.bot.sendMessage(chatId, `Admin : ${username}`, {
 			parse_mode: 'Markdown',
 			reply_markup: mp.adminMenu,

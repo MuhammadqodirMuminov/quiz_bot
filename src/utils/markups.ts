@@ -1,4 +1,4 @@
-import TelegramBot, { SendMessageOptions } from 'node-telegram-bot-api';
+import TelegramBot, { SendMessageOptions } from 'node-telegram-bot-api'
 
 export const adminMenu = {
 	keyboard: [
@@ -63,7 +63,7 @@ export const offMarkup: TelegramBot.SendMessageOptions['reply_markup'] = {
 	selective: true,
 };
 
-export const adsMenu = {
+export const subscribeMenu = {
 	keyboard: [
 		[{ text: '/create' }, { text: '/getAll' }],
 		[{ text: '/turnOff' }],
@@ -73,7 +73,7 @@ export const adsMenu = {
 	one_time_keyboard: false,
 };
 
-export const adsInlineButton = (
+export const subscribeInlineButton = (
 	username: string
 ): SendMessageOptions['reply_markup'] => ({
 	inline_keyboard: [
