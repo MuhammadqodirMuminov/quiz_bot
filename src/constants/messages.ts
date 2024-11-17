@@ -130,3 +130,27 @@ SHortName: ${ads.shortName}\n
 export const adsButton = (ads: Partial<IAdsData>) => `
 SHortName: ${ads.shortName}\n
 Укажите текст inline кнопки, если кнопка не нужна - отправьте 0`;
+
+export const adminStat = (
+	usersCount: number,
+	adminsCount: number,
+	testsCount: number,
+	subscribtionsCount: number,
+) => `
+📊 **Admin Statistics**
+
+👤 **Admins**
+- **Count**: ${adminsCount}
+
+🧑‍🤝‍🧑 **Users**
+- **Count**: ${usersCount}
+
+📝 **Tests**
+- **Count**: ${testsCount}
+
+📡 **Subscriptions**
+- **Count**: ${subscribtionsCount}
+
+--------------------------------------------------
+*Generated on: ${new Date().toLocaleString()}*
+`;

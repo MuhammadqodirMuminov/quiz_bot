@@ -1,5 +1,5 @@
 import { Model, Types } from 'mongoose';
-import { adsSchema, ISubscribe } from '../models/subscribe.schema';
+import { ISubscribe, adsSchema } from '../models/subscribe.schema';
 
 class SubscribeService {
 	protected SubscribeModel: Model<ISubscribe>;
@@ -43,11 +43,15 @@ class SubscribeService {
 				{ channels },
 				{
 					new: true,
-				}
+				},
 			);
 		} catch (error) {
 			throw new Error('Error updating subscribe');
 		}
+	}
+
+	async getAll() {
+		return await this.SubscribeModel.find();
 	}
 }
 

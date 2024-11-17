@@ -5,6 +5,9 @@ import { ms } from '../constants';
 import adminService from '../services/admin.service';
 import adsService from '../services/ads.service';
 import mailService from '../services/mail.service';
+import subscribeService from '../services/subscribe.service';
+import testService from '../services/test.service';
+import userService from '../services/user.service';
 import { extractUniqueCode, mp } from '../utils';
 
 class AdminModule {
@@ -45,10 +48,18 @@ class AdminModule {
 			try {
 				const { success } = await adminService.isAdmin(chatId);
 				if (success) {
-					await this.bot.sendMessage(chatId, 'Comming Soon!', {
-						parse_mode: 'Markdown',
-						reply_markup: mp.adminMenu,
-					});
+					const users = (await userService.getAll({})).length;
+					const admins = (await adminService.getAllAdmins({})).length;
+					const tests = (await testService.getAll()).length;
+					const subcribtions = (await subscribeService.getAll()).length;
+					await this.bot.sendMessage(
+						chatId,
+						ms.adminStat(users, admins, tests, subcribtions),
+						{
+							parse_mode: 'Markdown',
+							reply_markup: mp.adminMenu,
+						},
+					);
 				} else {
 					await this.bot.sendMessage(chatId, ms.notAdmin, {
 						parse_mode: 'Markdown',
