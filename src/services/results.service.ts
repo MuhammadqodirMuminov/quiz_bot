@@ -18,13 +18,34 @@ class ResultService {
 	}
 
 	async getOne(filerQuery: FilterQuery<IResult>) {
-		const result = await this.resultModel.findOne(filerQuery, {}, { populate: ['user', 'test'] });
+		const result = await this.resultModel.findOne(
+			filerQuery,
+			{},
+			{ populate: ['user', 'test'] },
+		);
 
 		return result;
 	}
 
+	async getAll(filerQuery: FilterQuery<IResult>) {
+		const results = await this.resultModel
+			.find(
+				filerQuery,
+				{},
+				{
+					populate: ['user', 'test'],
+				},
+			)
+			.lean(true);
+		return results as IResult[];
+	}
+
 	async update(filerQuery: FilterQuery<IResult>, update: { score: number }) {
-		const updateResult = await this.resultModel.findOneAndUpdate(filerQuery, { $push: { atteps: update } }, { new: true, populate: ['user', 'test'] });
+		const updateResult = await this.resultModel.findOneAndUpdate(
+			filerQuery,
+			{ $push: { atteps: update } },
+			{ new: true, populate: ['user', 'test'] },
+		);
 		return updateResult;
 	}
 }

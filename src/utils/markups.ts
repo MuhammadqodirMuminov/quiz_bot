@@ -53,7 +53,7 @@ export const cancelAndPushMail = {
 };
 
 export const userMenu: SendMessageOptions['reply_markup'] = {
-	keyboard: [[{ text: '/checkAnswers' }, { text: '/stat' }]],
+	keyboard: [[{ text: '/checkAnswers' }, { text: '/userStat' }]],
 	resize_keyboard: true,
 	one_time_keyboard: false,
 };
