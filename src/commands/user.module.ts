@@ -16,7 +16,7 @@ class UserModule {
 	}
 
 	checkAnswers() {
-		this.bot.onText(/\/checkAnswers/, async msg => {
+		this.bot.onText(/\📝 Tekshirish/, async msg => {
 			const chatId = msg.chat.id;
 			bot.sendMessage(chatId, ms.checkAnswers, {
 				reply_markup: { remove_keyboard: true },
@@ -27,7 +27,7 @@ class UserModule {
 	}
 
 	userStat() {
-		this.bot.onText(/\/userStat/, async msg => {
+		this.bot.onText(/\📊 Statistikam/, async msg => {
 			const chatId = msg.chat.id;
 			try {
 				const user = await userService.getOne({ chat_id: chatId });

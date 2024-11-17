@@ -97,25 +97,28 @@ export const ads = {
 };
 
 export const userStats = (results: IResult[]): string => `
-**Your Statistics:**
+✨ **Sizning Test Statistikalaringiz:**
 ${results
 	.map(result => {
 		return `
-📋 **Test**:
-  - **Name**: ${result.test.name}
-  - **Code**: ${result.test.code}
+📝 **Test Ma'lumotlari**:
+  - **Test Nomi**: ${result.test.name}
+  - **Test Kodi**: ${result.test.code}
 
-📈 **Attempts**:
+🎯 **Urinishlar Tarixi**:
 ${
 	result?.atteps
 		?.map((a, i) => {
-			return `    ${i + 1}. **Score**: ${a.score} ✅`;
+			return `    ${i + 1}. **Ball**: ${a.score} ✅  |  **Urush #${i + 1}**`;
 		})
-		.join('\n') || '    No attempts yet 🚫'
+		.join('\n') || "    Hali urinishlar yo'q 🚫"
 }
+
+📊 **Davom eting!** Ko'proq testlar topshiring va ko'nikmalaringizni oshiring! 🔥  
     `;
 	})
 	.join('\n')}
+🌟 **Mehnatingizni qadrlaymiz!**
 `;
 
 export const adminStatus = (status: boolean): string => `Выберите действие\n\nstatus: ${status}`;
@@ -153,4 +156,34 @@ export const adminStat = (
 
 --------------------------------------------------
 *Generated on: ${new Date().toLocaleString()}*
+`;
+
+export const joinMessage = (channels: string[]) => {
+	const channelLinks = channels
+		.map(channel => `<a href="https://t.me/${channel.link}">@${channel}</a>`)
+		.join(' va ');
+
+	return `
+		☝️ <b>Hurmatli foydalanuvchi,</b>
+
+		Siz ${channelLinks} kanallariga a'zo bo'lishingiz shart.  
+		A'zo bo'lmasangiz, botdan foydalana olmaysiz.  
+
+		✅ A'zo bo'lganingizdan so'ng, qayta urinib ko'ring.`;
+};
+
+export const helloMessage = `🎉 **Botimizga Xush Kelibsiz!** 🎉  
+
+✅ Siz muvaffaqiyatli tizimga kirdingiz va endi quyidagi imkoniyatlardan foydalanishingiz mumkin:  
+
+📝 **Online Testlar:**  
+Turli mavzular bo'yicha testlarni yechib, bilimlaringizni sinab ko'ring.  
+
+📊 **Natijalarni Tahlil Qilish:**  
+Test natijalaringizni ko'rib chiqib, o'z mahoratingizni oshiring.  
+
+🔗 **Foydali Kanal va Guruhlar:**  
+Bizning hamkor kanallarimizga ulanishni unutmang!  
+
+🚀 **Bilim sari birinchi qadamni qo'ying!**  
 `;

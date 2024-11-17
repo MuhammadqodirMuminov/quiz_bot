@@ -51,7 +51,7 @@ export const cancelAndPushMail = {
 };
 
 export const userMenu: SendMessageOptions['reply_markup'] = {
-	keyboard: [[{ text: '/checkAnswers' }, { text: '/userStat' }]],
+	keyboard: [[{ text: '📝 Tekshirish' }, { text: '📊 Statistikam' }]],
 	resize_keyboard: true,
 	one_time_keyboard: false,
 };
@@ -95,4 +95,16 @@ export const adsMenu: SendMessageOptions['reply_markup'] = {
 
 export const confirmAd: SendMessageOptions['reply_markup'] = {
 	keyboard: [[{ text: '/confirmAd' }, { text: '/declineAd' }]],
+};
+
+export const channelBtns = (cannels: string[]): SendMessageOptions['reply_markup'] => {
+	return {
+		inline_keyboard: [
+			cannels.map((c, i) => {
+				return { text: `${i + 1}-kanalga o'tish 👉`, url: `https://t.me/${c}` };
+			}),
+			[{ text: "✅Azo bo'ldim", callback_data: 'user_joined' }],
+		],
+		resize_keyboard: true,
+	};
 };
