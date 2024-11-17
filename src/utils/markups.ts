@@ -1,4 +1,4 @@
-import TelegramBot, { SendMessageOptions } from 'node-telegram-bot-api'
+import { SendMessageOptions } from 'node-telegram-bot-api';
 
 export const adminMenu = {
 	keyboard: [
@@ -52,13 +52,13 @@ export const cancelAndPushMail = {
 	one_time_keyboard: false,
 };
 
-export const userMenu: TelegramBot.SendMessageOptions['reply_markup'] = {
+export const userMenu: SendMessageOptions['reply_markup'] = {
 	keyboard: [[{ text: '/checkAnswers' }, { text: '/stat' }]],
 	resize_keyboard: true,
 	one_time_keyboard: false,
 };
 
-export const offMarkup: TelegramBot.SendMessageOptions['reply_markup'] = {
+export const offMarkup: SendMessageOptions['reply_markup'] = {
 	remove_keyboard: true,
 	selective: true,
 };
@@ -85,3 +85,16 @@ export const subscribeInlineButton = (
 		],
 	],
 });
+
+export const adsMenu: SendMessageOptions['reply_markup'] = {
+	keyboard: [
+		[{ text: '/turnOn' }, { text: '/turnOff' }],
+		[{ text: '/newAd' }, { text: '/deleteAd' }],
+		[{ text: '/listAd' }, { text: '/getAd' }],
+		[{ text: '/admin' }],
+	],
+};
+
+export const confirmAd: SendMessageOptions['reply_markup'] = {
+	keyboard: [[{ text: '/confirmAd' }, { text: '/declineAd' }]],
+};
