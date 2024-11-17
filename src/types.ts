@@ -8,5 +8,10 @@ export enum FileTypes {
 	IMAGE = 'IMAGE',
 	VIDEO = 'VIDEO',
 	DOCUMENT = 'DOCUMENT',
-    AUDIO = 'AUDIO',
+	AUDIO = 'AUDIO',
+}
+
+export interface IAdsData {
+	shortName?: string;
+	text?: string;
 }

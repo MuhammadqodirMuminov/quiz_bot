@@ -1,4 +1,5 @@
 import { IResult } from '../models/result.schema';
+import { IAdsData } from '../types';
 
 export const notAdmin = 'account is not admin';
 
@@ -116,3 +117,16 @@ ${
 	})
 	.join('\n')}
 `;
+
+export const adminStatus = (status: boolean): string => `Выберите действие\n\nstatus: ${status}`;
+
+export const adsOnMessage = (status: boolean) => `Реклама включена : ${status}`;
+
+export const shortName = () => `Укажите короткое имя для нового рекламного поста`;
+export const adsData = (ads: Partial<IAdsData>) => `
+SHortName: ${ads.shortName}\n
+Укажите текст рекламного поста в разметке MARKDOWN`;
+
+export const adsButton = (ads: Partial<IAdsData>) => `
+SHortName: ${ads.shortName}\n
+Укажите текст inline кнопки, если кнопка не нужна - отправьте 0`;
