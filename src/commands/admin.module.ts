@@ -19,22 +19,24 @@ class AdminModule {
 	admin() {
 		this.bot.onText(/\/(admin|admin_menu)/, async msg => {
 			const chatId = msg.chat.id;
-			const username = msg.from?.username;
+			const username = msg.from?.username || 'User';
 			try {
 				const code = extractUniqueCode(msg.text!);
 				const { success } = await adminService.isAdmin(chatId);
 
 				if (success) {
-					await this.admin_options(chatId, username || '');
+					await this.admin_options(chatId, username);
 				} else if (!success && code == ADMIN_PASS) {
 					await adminService.create({ chat_id: chatId, username });
-					await this.admin_options(chatId, username || '');
+					await this.admin_options(chatId, username);
 				} else {
 					await this.bot.sendMessage(chatId, ms.notAdmin, {
 						parse_mode: 'Markdown',
 					});
 				}
 			} catch (error: any) {
+				console.log(error);
+
 				this.bot.sendMessage(chatId, `Error: ${error?.message}`, {
 					parse_mode: 'Markdown',
 				});
@@ -74,9 +76,9 @@ class AdminModule {
 	}
 
 	async admin_options(chatId: number, username: string) {
-		return await this.bot.sendMessage(chatId, `Admin : ${username}`, {
-			parse_mode: 'Markdown',
+		return await this.bot.sendMessage(chatId, 'Admin', {
 			reply_markup: mp.adminMenu,
+			parse_mode: 'Markdown',
 		});
 	}
 
