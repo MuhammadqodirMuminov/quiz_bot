@@ -1,3 +1,5 @@
+import { IResult } from '../models/result.schema';
+
 export const notAdmin = 'account is not admin';
 
 export const mailUsersMsg = 'Write text in the MARKDOWN markup or click cancel_mail';
@@ -59,7 +61,12 @@ yoki
 1234*1a2d3c4a5b
 `;
 
-export const testResult = (testNomi: string, trueAnswersCount: number, falseAnswersCount: number, falseAnswers: { index: number; answer: string }[]): string => {
+export const testResult = (
+	testNomi: string,
+	trueAnswersCount: number,
+	falseAnswersCount: number,
+	falseAnswers: { index: number; answer: string }[],
+): string => {
 	return `
 # Test Result for "${testNomi}"
 
@@ -67,7 +74,13 @@ export const testResult = (testNomi: string, trueAnswersCount: number, falseAnsw
 - **Incorrect Answers:** ${falseAnswersCount}
 
 ## Incorrect Answers Details
-${falseAnswers.length > 0 ? falseAnswers.map(fa => `- **Question ${fa.index + 1}**: Your answer: ${fa.answer}`).join('\n') : 'No incorrect answers!'}
+${
+	falseAnswers.length > 0
+		? falseAnswers
+				.map(fa => `- **Question ${fa.index + 1}**:  True answer: ${fa.answer}`)
+				.join('\n')
+		: 'No incorrect answers!'
+}
   `;
 };
 
@@ -79,7 +92,27 @@ const result = testResult('Sample Test', 8, 2, [
 
 export const ads = {
 	homeMsg: `Choose your channels or create new One!`,
-	channelName: `Enter channel name for ads\n<code>@channel_name</code>`
-}
+	channelName: `Enter channel name for ads\n<code>@channel_name</code>`,
+};
 
-console.log(result);
+export const userStats = (results: IResult[]): string => `
+**Your Statistics:**
+${results
+	.map(result => {
+		return `
+📋 **Test**:
+  - **Name**: ${result.test.name}
+  - **Code**: ${result.test.code}
+
+📈 **Attempts**:
+${
+	result?.atteps
+		?.map((a, i) => {
+			return `    ${i + 1}. **Score**: ${a.score} ✅`;
+		})
+		.join('\n') || '    No attempts yet 🚫'
+}
+    `;
+	})
+	.join('\n')}
+`;
