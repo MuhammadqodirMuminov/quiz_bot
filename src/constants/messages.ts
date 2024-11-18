@@ -3,7 +3,8 @@ import { IAdsData } from '../types';
 
 export const notAdmin = 'account is not admin';
 
-export const mailUsersMsg = 'Write text in the MARKDOWN markup or click cancel_mail';
+export const mailUsersMsg =
+	'Write text in the MARKDOWN markup or click cancel_mail';
 
 // export const
 export const testHomeMessage = `Choose your test or create new One!`;
@@ -66,7 +67,7 @@ export const testResult = (
 	testNomi: string,
 	trueAnswersCount: number,
 	falseAnswersCount: number,
-	falseAnswers: { index: number; answer: string }[],
+	falseAnswers: { index: number; answer: string }[]
 ): string => {
 	return `
 # Test Result for "${testNomi}"
@@ -78,7 +79,9 @@ export const testResult = (
 ${
 	falseAnswers.length > 0
 		? falseAnswers
-				.map(fa => `- **Question ${fa.index + 1}**:  True answer: ${fa.answer}`)
+				.map(
+					(fa) => `- **Question ${fa.index + 1}**:  True answer: ${fa.answer}`
+				)
 				.join('\n')
 		: 'No incorrect answers!'
 }
@@ -99,7 +102,7 @@ export const ads = {
 export const userStats = (results: IResult[]): string => `
 ✨ **Sizning Test Statistikalaringiz:**
 ${results
-	.map(result => {
+	.map((result) => {
 		return `
 📝 **Test Ma'lumotlari**:
   - **Test Nomi**: ${result.test.name}
@@ -121,11 +124,13 @@ ${
 🌟 **Mehnatingizni qadrlaymiz!**
 `;
 
-export const adminStatus = (status: boolean): string => `Выберите действие\n\nstatus: ${status}`;
+export const adminStatus = (status: boolean): string =>
+	`Выберите действие\n\nstatus: ${status}`;
 
 export const adsOnMessage = (status: boolean) => `Реклама включена : ${status}`;
 
-export const shortName = () => `Укажите короткое имя для нового рекламного поста`;
+export const shortName = () =>
+	`Укажите короткое имя для нового рекламного поста`;
 export const adsData = (ads: Partial<IAdsData>) => `
 SHortName: ${ads.shortName}\n
 Укажите текст рекламного поста в разметке MARKDOWN`;
@@ -138,7 +143,7 @@ export const adminStat = (
 	usersCount: number,
 	adminsCount: number,
 	testsCount: number,
-	subscribtionsCount: number,
+	subscriptionsCount: number
 ) => `
 📊 **Admin Statistics**
 
@@ -152,7 +157,7 @@ export const adminStat = (
 - **Count**: ${testsCount}
 
 📡 **Subscriptions**
-- **Count**: ${subscribtionsCount}
+- **Count**: ${subscriptionsCount}
 
 --------------------------------------------------
 *Generated on: ${new Date().toLocaleString()}*
@@ -160,7 +165,7 @@ export const adminStat = (
 
 export const joinMessage = (channels: string[]) => {
 	const channelLinks = channels
-		.map(channel => `<a href="https://t.me/${channel.link}">@${channel}</a>`)
+		.map((channel) => `<a href="https://t.me/${channel.link}">@${channel}</a>`)
 		.join(' va ');
 
 	return `

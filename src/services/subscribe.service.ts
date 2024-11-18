@@ -2,17 +2,17 @@ import { Model, Types } from 'mongoose';
 import { ISubscribe, adsSchema } from '../models/subscribe.schema';
 
 class SubscribeService {
-	protected SubscribeModel: Model<ISubscribe>;
+	protected subscribeModel: Model<ISubscribe>;
 
-	constructor(SubscribeModel: Model<ISubscribe>) {
-		this.SubscribeModel = SubscribeModel;
+	constructor(subscribeModel: Model<ISubscribe>) {
+		this.subscribeModel = subscribeModel;
 	}
 
 	async getOne() {
 		try {
-			const subscribe = await this.SubscribeModel.find();
+			const subscribe = await this.subscribeModel.find();
 			if (!subscribe.length) {
-				const newAd = await this.SubscribeModel.create({
+				const newAd = await this.subscribeModel.create({
 					isActive: true,
 					channels: [],
 					_id: new Types.ObjectId(),
@@ -38,20 +38,29 @@ class SubscribeService {
 	async update(channels: string[]) {
 		try {
 			const existSubscribe = await this.getOne();
-			return await this.SubscribeModel.findByIdAndUpdate(
+			return await this.subscribeModel.findByIdAndUpdate(
 				existSubscribe.id,
 				{ channels },
 				{
 					new: true,
-				},
+				}
 			);
 		} catch (error) {
 			throw new Error('Error updating subscribe');
 		}
 	}
 
-	async getAll() {
-		return await this.SubscribeModel.find();
+	async updateIsActive(isActive: boolean) {
+		try {
+			const existSubscribe = await this.getOne();
+			return await this.subscribeModel.findByIdAndUpdate(
+				existSubscribe.id,
+				{ isActive },
+				{ new: true }
+			);
+		} catch (error) {
+			throw new Error('Error update is active subscribe');
+		}
 	}
 }
 

@@ -17,7 +17,7 @@ class AdminModule {
 	}
 
 	admin() {
-		this.bot.onText(/\/(admin|admin_menu)/, async msg => {
+		this.bot.onText(/\/(admin|admin_menu)/, async (msg) => {
 			const chatId = msg.chat.id;
 			const username = msg.from?.username || 'User';
 			try {
@@ -45,7 +45,7 @@ class AdminModule {
 	}
 
 	async stat() {
-		this.bot.onText(/\/stat/, async msg => {
+		this.bot.onText(/\/stat/, async (msg) => {
 			const chatId = msg.chat.id;
 			try {
 				const { success } = await adminService.isAdmin(chatId);
@@ -53,14 +53,15 @@ class AdminModule {
 					const users = (await userService.getAll({})).length;
 					const admins = (await adminService.getAllAdmins({})).length;
 					const tests = (await testService.getAll()).length;
-					const subcribtions = (await subscribeService.getAll()).length;
+					const subscriptions = (await subscribeService.getOne()).channels
+						.length;
 					await this.bot.sendMessage(
 						chatId,
-						ms.adminStat(users, admins, tests, subcribtions),
+						ms.adminStat(users, admins, tests, subscriptions),
 						{
 							parse_mode: 'Markdown',
 							reply_markup: mp.adminMenu,
-						},
+						}
 					);
 				} else {
 					await this.bot.sendMessage(chatId, ms.notAdmin, {
@@ -83,7 +84,7 @@ class AdminModule {
 	}
 
 	private async mail_users() {
-		this.bot.onText(/\/mail_users/, async msg => {
+		this.bot.onText(/\/mail_users/, async (msg) => {
 			const chatId = msg.chat.id;
 			const { success } = await adminService.isAdmin(chatId);
 			const messageContent = {};
@@ -105,7 +106,7 @@ class AdminModule {
 	}
 
 	private ads() {
-		this.bot.onText(/\/ads/, async msg => {
+		this.bot.onText(/\/ads/, async (msg) => {
 			const chatId = msg.chat.id;
 			try {
 				const { success } = await adminService.isAdmin(chatId);

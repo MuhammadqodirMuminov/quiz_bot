@@ -13,7 +13,7 @@ class SubscribeModule {
 	}
 
 	async subscribe() {
-		this.bot.onText(/\/subscription/, async msg => {
+		this.bot.onText(/\/subscription/, async (msg) => {
 			const chatId = msg.chat.id;
 
 			try {
@@ -37,7 +37,7 @@ class SubscribeModule {
 	}
 
 	private async subscribeManage() {
-		this.bot.once('message', async msg => {
+		this.bot.once('message', async (msg) => {
 			const chatId = msg.chat.id;
 			const text = msg.text?.trim();
 
@@ -61,25 +61,30 @@ class SubscribeModule {
 									reply_markup: mp.subscribeInlineButton(ad),
 								})
 								.then(() =>
-									adminModule.admin_options(
-										chatId,
-										msg.from?.username || '',
-									),
+									adminModule.admin_options(chatId, msg.from?.username || '')
 								);
 						}
 					} else {
 						this.bot
 							.sendMessage(chatId, 'No subscribe channels!')
 							.then(() =>
-								adminModule.admin_options(
-									chatId,
-									msg.from?.username || '',
-								),
+								adminModule.admin_options(chatId, msg.from?.username || '')
 							);
 					}
 				} else if (text === '/turnOff') {
-					await subscribeService.update([]);
-					this.bot.sendMessage(chatId, 'Subscribe turned off successfully');
+					await subscribeService.updateIsActive(false);
+					this.bot
+						.sendMessage(chatId, 'Subscribe turned off successfully')
+						.then(() =>
+							adminModule.admin_options(chatId, msg.from?.username || '')
+						);
+				} else if (text === '/turnOn') {
+					await subscribeService.updateIsActive(true);
+					this.bot
+						.sendMessage(chatId, 'Subscribe turned on successfully')
+						.then(() =>
+							adminModule.admin_options(chatId, msg.from?.username || '')
+						);
 				}
 			} else {
 				return await this.bot.sendMessage(chatId, ms.notAdmin);
@@ -88,7 +93,7 @@ class SubscribeModule {
 	}
 
 	private async subscribeCreate() {
-		this.bot.once('message', async msg => {
+		this.bot.once('message', async (msg) => {
 			const chatId = msg.chat.id;
 			const username = msg.text?.trim().split('@')[1];
 			const { success } = await adminService.isAdmin(chatId);
@@ -101,22 +106,13 @@ class SubscribeModule {
 					await bot
 						.sendMessage(chatId, 'New ads created successfully')
 						.then(() =>
-							adminModule.admin_options(
-								chatId,
-								msg.from?.username || '',
-							),
+							adminModule.admin_options(chatId, msg.from?.username || '')
 						);
 				} catch (error: any) {
 					await this.bot
-						.sendMessage(
-							chatId,
-							`🚫 Error: Username @${username} not found`,
-						)
+						.sendMessage(chatId, `🚫 Error: Username @${username} not found`)
 						.then(() =>
-							adminModule.admin_options(
-								chatId,
-								msg.from?.username || '',
-							),
+							adminModule.admin_options(chatId, msg.from?.username || '')
 						);
 				}
 			}
@@ -124,7 +120,7 @@ class SubscribeModule {
 	}
 
 	async deleteSubscribe() {
-		this.bot.on('callback_query', async msg => {
+		this.bot.on('callback_query', async (msg) => {
 			const data = msg.data;
 			const chatId = msg.message?.chat.id;
 			if (data && chatId) {
@@ -132,7 +128,7 @@ class SubscribeModule {
 					if (data && data.startsWith('delete_ads_')) {
 						const username = data.split('delete_ads_')[1];
 						const existAd = await subscribeService.getOne();
-						const channels = existAd?.channels.filter(c => c !== username);
+						const channels = existAd?.channels.filter((c) => c !== username);
 
 						const updateAd = await subscribeService.update(channels);
 

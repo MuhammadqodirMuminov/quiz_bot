@@ -22,7 +22,9 @@ export const testSaveMenu = {
 	one_time_keyboard: false,
 };
 
-export const testInlineButton = (code: number): SendMessageOptions['reply_markup'] => ({
+export const testInlineButton = (
+	code: number
+): SendMessageOptions['reply_markup'] => ({
 	remove_keyboard: true,
 	selective: true,
 	inline_keyboard: [
@@ -61,17 +63,19 @@ export const offMarkup: SendMessageOptions['reply_markup'] = {
 	selective: true,
 };
 
-export const subscribeMenu = {
+export const subscribeMenu: SendMessageOptions['reply_markup'] = {
 	keyboard: [
 		[{ text: '/create' }, { text: '/getAll' }],
-		[{ text: '/turnOff' }],
+		[{ text: '/turnOff' }, { text: '/turnOn' }],
 		[{ text: '/admin' }],
 	],
 	resize_keyboard: true,
 	one_time_keyboard: false,
 };
 
-export const subscribeInlineButton = (username: string): SendMessageOptions['reply_markup'] => ({
+export const subscribeInlineButton = (
+	username: string
+): SendMessageOptions['reply_markup'] => ({
 	inline_keyboard: [
 		[
 			{
@@ -97,7 +101,9 @@ export const confirmAd: SendMessageOptions['reply_markup'] = {
 	keyboard: [[{ text: '/confirmAd' }, { text: '/declineAd' }]],
 };
 
-export const channelBtns = (cannels: string[]): SendMessageOptions['reply_markup'] => {
+export const channelBtns = (
+	cannels: string[]
+): SendMessageOptions['reply_markup'] => {
 	return {
 		inline_keyboard: [
 			cannels.map((c, i) => {
