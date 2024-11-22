@@ -12,4 +12,4 @@ export const SubscribeDocument = new Schema<ISubscribe>({
 	channels: { type: [String], required: true, default: [] },
 });
 
-export const adsSchema = model<ISubscribe>('subscribe', SubscribeDocument);
+export const subscribeSchema = model<ISubscribe>('subscribe', SubscribeDocument);

@@ -1,5 +1,5 @@
 import { Model, Types } from 'mongoose';
-import { ISubscribe, adsSchema } from '../models/subscribe.schema';
+import { ISubscribe, subscribeSchema } from '../models/subscribe.schema';
 
 class SubscribeService {
 	protected subscribeModel: Model<ISubscribe>;
@@ -62,6 +62,19 @@ class SubscribeService {
 			throw new Error('Error update is active subscribe');
 		}
 	}
+
+	async updateAdStatus(adStatus: boolean) {
+		try {
+			const existSubscribe = await this.getOne();
+			return await this.subscribeModel.findByIdAndUpdate(
+				existSubscribe.id,
+				{ adStatus },
+				{ new: true }
+			);
+		} catch (error) {
+			throw new Error('Error update ad status');
+		}
+	}
 }
 
-export default new SubscribeService(adsSchema);
+export default new SubscribeService(subscribeSchema);

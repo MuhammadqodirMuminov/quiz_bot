@@ -29,7 +29,7 @@ class AdminService {
 				await newAdmin.save();
 				return { data: newAdmin };
 			} catch (error: any) {
-				return { message: 'Eror create user' };
+				return { message: 'Error create user' };
 			}
 		}
 		return { data: existUser };

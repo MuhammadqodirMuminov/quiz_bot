@@ -14,4 +14,8 @@ export enum FileTypes {
 export interface IAdsData {
 	shortName?: string;
 	text?: string;
+	file?: string;
+	mediaType?: FileTypes;
+	btnText?: string;
+	btnUrl?: string;
 }

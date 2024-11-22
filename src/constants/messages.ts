@@ -131,13 +131,27 @@ export const adsOnMessage = (status: boolean) => `Реклама включен�
 
 export const shortName = () =>
 	`Укажите короткое имя для нового рекламного поста`;
+
 export const adsData = (ads: Partial<IAdsData>) => `
 SHortName: ${ads.shortName}\n
 Укажите текст рекламного поста в разметке MARKDOWN`;
 
-export const adsButton = (ads: Partial<IAdsData>) => `
-SHortName: ${ads.shortName}\n
+export const adsText = (ads: Partial<IAdsData>) => `
+ShortName: ${ads.shortName}\n
 Укажите текст inline кнопки, если кнопка не нужна - отправьте 0`;
+
+export const adsBtnText = `1 - прикрепить файл\n0- не прикреплять`;
+
+export const adsBtnText2 = `Укажите ссылку к inline кнопке`;
+
+export const adsMedia = `Прикрепите медиа (jpg .jpeg .mp4)`;
+
+export const adsMediaText = `1 - прикрепить файл\n0- не прикреплять\n\n.jpg .jpeg .mp4`;
+
+export const adsMediaText2 = (shortName: string, text: string) =>
+	`**Shortname: ${shortName}** \n${text}`;
+
+export const adsCreate = `Рекламный пост добавлен`;
 
 export const adminStat = (
 	usersCount: number,
