@@ -31,7 +31,7 @@ export const testInlineButton = (
 		[{ text: 'send', callback_data: `send_test_${code}` }],
 		[
 			{
-				text: '❌ delete test',
+				text: 'Complate',
 				callback_data: `edit_test_${code}`,
 			},
 		],
