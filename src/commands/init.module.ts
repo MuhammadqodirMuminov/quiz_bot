@@ -2,6 +2,7 @@ import adminModule from './admin.module';
 import adsModule from './ads.module';
 import helpModule from './help.module';
 import startModule from './start.module';
+import subscibeModule from './subscibe.module';
 import testModule from './test.module';
 import userModule from './user.module';
 
@@ -14,8 +15,9 @@ class InitModule {
 			helpModule,
 			userModule,
 			adsModule,
+			subscibeModule,
 		];
-		allModules.forEach((module) => module.init());
+		allModules.forEach(module => module.init());
 	}
 }
 

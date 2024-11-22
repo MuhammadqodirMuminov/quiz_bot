@@ -1,54 +1,32 @@
-import { FilterQuery, Model, Types } from 'mongoose';
-import { adsSchema, IAds } from '../models/ads.schema';
+import TelegramBot from 'node-telegram-bot-api';
+import { bot } from '../config/bot.config';
+import { IAdsData } from '../types';
 
 class AdsService {
-	protected adsModel: Model<IAds>;
+	private bot: TelegramBot;
+	private _adsStatus: boolean = false;
 
-	constructor(adsModel: Model<IAds>) {
-		this.adsModel = adsModel;
+	private _ads: IAdsData = {};
+
+	constructor(bot: TelegramBot) {
+		this.bot = bot;
 	}
 
-	async getOne() {
-		try {
-			const ads = await this.adsModel.find();
-			if (!ads.length) {
-				const newAd = await this.adsModel.create({
-					isActive: true,
-					channels: [],
-					_id: new Types.ObjectId(),
-				});
-				return await newAd.save();
-			}
-			return ads[0];
-		} catch (error) {
-			throw new Error('Ads get error');
-		}
+	get adsStatus(): boolean {
+		return this._adsStatus;
 	}
 
-	async create(username: string) {
-		try {
-			const existAd = await this.getOne();
-			const channels = [...existAd.channels, username];
-			return await this.update(channels);
-		} catch (error) {
-			throw new Error('Ads create error');
-		}
+	set adsStatus(status: boolean) {
+		this._adsStatus = status;
 	}
 
-	async update(channels: string[]) {
-		try {
-			const existAd = await this.getOne();
-			return await this.adsModel.findByIdAndUpdate(
-				existAd.id,
-				{ channels },
-				{
-					new: true,
-				}
-			);
-		} catch (error) {
-			throw new Error('Error updating ads');
-		}
+	get ads(): IAdsData {
+		return this._ads;
+	}
+
+	set ads(ads: Partial<IAdsData>) {
+		this._ads = { ...this._ads, ...ads };
 	}
 }
 
-export default new AdsService(adsSchema);
+export default new AdsService(bot);

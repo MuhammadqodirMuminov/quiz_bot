@@ -1,4 +1,4 @@
-import TelegramBot, { SendMessageOptions } from 'node-telegram-bot-api';
+import TelegramBot from 'node-telegram-bot-api';
 import { bot } from '../config/bot.config';
 import { ms } from '../constants';
 import { testResult } from '../constants/messages';
@@ -16,13 +16,33 @@ class UserModule {
 	}
 
 	checkAnswers() {
-		this.bot.onText(/\/checkAnswers/, async msg => {
+		this.bot.onText(/\📝 Tekshirish/, async msg => {
 			const chatId = msg.chat.id;
-			bot.sendMessage(chatId, ms.checkAnswers, { reply_markup: { remove_keyboard: true } }).then(() => {
+			bot.sendMessage(chatId, ms.checkAnswers, {
+				reply_markup: { remove_keyboard: true },
+			}).then(() => {
 				this.handleResult();
 			});
 		});
 	}
+
+	userStat() {
+		this.bot.onText(/\📊 Statistikam/, async msg => {
+			const chatId = msg.chat.id;
+			try {
+				const user = await userService.getOne({ chat_id: chatId });
+				const results = await resultsService.getAll({ user: user });
+
+				return await this.bot.sendMessage(chatId, ms.userStats(results), {
+					reply_markup: mp.userMenu,
+					parse_mode: 'Markdown',
+				});
+			} catch (error: any) {
+				await this.bot.sendMessage(chatId, error.message);
+			}
+		});
+	}
+
 	private handleResult() {
 		this.bot.once('message', async msg => {
 			const chatId = msg.chat.id;
@@ -34,17 +54,23 @@ class UserModule {
 				const test = await testService.getOne({ code: results.number });
 
 				if (!test) {
-					await bot.sendMessage(chatId, ms.test.notFound, { reply_markup: mp.userMenu });
+					await bot.sendMessage(chatId, ms.test.notFound, {
+						reply_markup: mp.userMenu,
+					});
 					return;
 				}
 
 				if (test && test.isPublished === false) {
-					await bot.sendMessage(chatId, ms.test.notFound, { reply_markup: mp.userMenu });
+					await bot.sendMessage(chatId, ms.test.notFound, {
+						reply_markup: mp.userMenu,
+					});
 					return;
 				}
 
 				if (results.pattern.length !== test.count) {
-					await bot.sendMessage(chatId, ms.test.wrongCount, { reply_markup: mp.userMenu });
+					await bot.sendMessage(chatId, ms.test.wrongCount, {
+						reply_markup: mp.userMenu,
+					});
 					return;
 				}
 
@@ -59,7 +85,7 @@ class UserModule {
 						{ user: user, test: test },
 						{
 							score: checkedAnswers.correctMatches,
-						}
+						},
 					);
 				} else {
 					await resultsService.create({
@@ -72,12 +98,23 @@ class UserModule {
 						],
 					});
 				}
-				await this.bot.sendMessage(chatId, testResult(test.name, checkedAnswers.correctMatches, checkedAnswers.wrongAnswers.length, checkedAnswers.wrongAnswers), {
-					reply_markup: mp.userMenu,
-					parse_mode: 'Markdown',
-				});
+				await this.bot.sendMessage(
+					chatId,
+					testResult(
+						test.name,
+						checkedAnswers.correctMatches,
+						checkedAnswers.wrongAnswers.length,
+						checkedAnswers.wrongAnswers,
+					),
+					{
+						reply_markup: mp.userMenu,
+						parse_mode: 'Markdown',
+					},
+				);
 			} else {
-				await bot.sendMessage(chatId, ms.checkAnswers, { reply_markup: mp.userMenu });
+				await bot.sendMessage(chatId, ms.checkAnswers, {
+					reply_markup: mp.userMenu,
+				});
 				return;
 			}
 		});
@@ -121,11 +158,15 @@ class UserModule {
 			}
 		}
 
-		await this.bot.sendMessage(adminChatId, `Sent ${sended} \nNot Sent ${unSended}`, { parse_mode: 'Markdown', reply_markup: mp.adminMenu });
+		await this.bot.sendMessage(adminChatId, `Sent ${sended} \nNot Sent ${unSended}`, {
+			parse_mode: 'Markdown',
+			reply_markup: mp.adminMenu,
+		});
 	}
 
 	init() {
 		this.checkAnswers();
+		this.userStat();
 	}
 }
 

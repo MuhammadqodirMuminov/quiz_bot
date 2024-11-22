@@ -1,4 +1,4 @@
-import TelegramBot, { SendMessageOptions } from 'node-telegram-bot-api';
+import { SendMessageOptions } from 'node-telegram-bot-api';
 
 export const adminMenu = {
 	keyboard: [
@@ -52,28 +52,28 @@ export const cancelAndPushMail = {
 	one_time_keyboard: false,
 };
 
-export const userMenu: TelegramBot.SendMessageOptions['reply_markup'] = {
-	keyboard: [[{ text: '/checkAnswers' }, { text: '/stat' }]],
+export const userMenu: SendMessageOptions['reply_markup'] = {
+	keyboard: [[{ text: '📝 Tekshirish' }, { text: '📊 Statistikam' }]],
 	resize_keyboard: true,
 	one_time_keyboard: false,
 };
 
-export const offMarkup: TelegramBot.SendMessageOptions['reply_markup'] = {
+export const offMarkup: SendMessageOptions['reply_markup'] = {
 	remove_keyboard: true,
 	selective: true,
 };
 
-export const adsMenu = {
+export const subscribeMenu: SendMessageOptions['reply_markup'] = {
 	keyboard: [
 		[{ text: '/create' }, { text: '/getAll' }],
-		[{ text: '/turnOff' }],
+		[{ text: '/turnOff' }, { text: '/turnOn' }],
 		[{ text: '/admin' }],
 	],
 	resize_keyboard: true,
 	one_time_keyboard: false,
 };
 
-export const adsInlineButton = (
+export const subscribeInlineButton = (
 	username: string
 ): SendMessageOptions['reply_markup'] => ({
 	inline_keyboard: [
@@ -85,3 +85,32 @@ export const adsInlineButton = (
 		],
 	],
 });
+
+export const adsMenu: SendMessageOptions['reply_markup'] = {
+	keyboard: [
+		[{ text: '/turn_on_ads' }, { text: '/turn_off_ads' }],
+		[{ text: '/new_ad' }, { text: '/delete_ad' }],
+		[{ text: '/list_ad' }, { text: '/get_ad' }],
+		[{ text: '/admin' }],
+	],
+	remove_keyboard: true,
+	one_time_keyboard: false,
+};
+
+export const confirmAd: SendMessageOptions['reply_markup'] = {
+	keyboard: [[{ text: '/confirmAd' }, { text: '/declineAd' }]],
+};
+
+export const channelBtns = (
+	cannels: string[]
+): SendMessageOptions['reply_markup'] => {
+	return {
+		inline_keyboard: [
+			cannels.map((c, i) => {
+				return { text: `${i + 1}-kanalga o'tish 👉`, url: `https://t.me/${c}` };
+			}),
+			[{ text: "✅Azo bo'ldim", callback_data: 'user_joined' }],
+		],
+		resize_keyboard: true,
+	};
+};

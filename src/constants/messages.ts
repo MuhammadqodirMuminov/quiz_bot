@@ -1,6 +1,10 @@
+import { IResult } from '../models/result.schema';
+import { IAdsData } from '../types';
+
 export const notAdmin = 'account is not admin';
 
-export const mailUsersMsg = 'Write text in the MARKDOWN markup or click cancel_mail';
+export const mailUsersMsg =
+	'Write text in the MARKDOWN markup or click cancel_mail';
 
 // export const
 export const testHomeMessage = `Choose your test or create new One!`;
@@ -59,7 +63,12 @@ yoki
 1234*1a2d3c4a5b
 `;
 
-export const testResult = (testNomi: string, trueAnswersCount: number, falseAnswersCount: number, falseAnswers: { index: number; answer: string }[]): string => {
+export const testResult = (
+	testNomi: string,
+	trueAnswersCount: number,
+	falseAnswersCount: number,
+	falseAnswers: { index: number; answer: string }[]
+): string => {
 	return `
 # Test Result for "${testNomi}"
 
@@ -67,7 +76,15 @@ export const testResult = (testNomi: string, trueAnswersCount: number, falseAnsw
 - **Incorrect Answers:** ${falseAnswersCount}
 
 ## Incorrect Answers Details
-${falseAnswers.length > 0 ? falseAnswers.map(fa => `- **Question ${fa.index + 1}**: Your answer: ${fa.answer}`).join('\n') : 'No incorrect answers!'}
+${
+	falseAnswers.length > 0
+		? falseAnswers
+				.map(
+					(fa) => `- **Question ${fa.index + 1}**:  True answer: ${fa.answer}`
+				)
+				.join('\n')
+		: 'No incorrect answers!'
+}
   `;
 };
 
@@ -79,7 +96,99 @@ const result = testResult('Sample Test', 8, 2, [
 
 export const ads = {
 	homeMsg: `Choose your channels or create new One!`,
-	channelName: `Enter channel name for ads\n<code>@channel_name</code>`
+	channelName: `Enter channel name for ads\n<code>@channel_name</code>`,
+};
+
+export const userStats = (results: IResult[]): string => `
+✨ **Sizning Test Statistikalaringiz:**
+${results
+	.map((result) => {
+		return `
+📝 **Test Ma'lumotlari**:
+  - **Test Nomi**: ${result.test.name}
+  - **Test Kodi**: ${result.test.code}
+
+🎯 **Urinishlar Tarixi**:
+${
+	result?.atteps
+		?.map((a, i) => {
+			return `    ${i + 1}. **Ball**: ${a.score} ✅  |  **Urush #${i + 1}**`;
+		})
+		.join('\n') || "    Hali urinishlar yo'q 🚫"
 }
 
-console.log(result);
+📊 **Davom eting!** Ko'proq testlar topshiring va ko'nikmalaringizni oshiring! 🔥  
+    `;
+	})
+	.join('\n')}
+🌟 **Mehnatingizni qadrlaymiz!**
+`;
+
+export const adminStatus = (status: boolean): string =>
+	`Выберите действие\n\nstatus: ${status}`;
+
+export const adsOnMessage = (status: boolean) => `Реклама включена : ${status}`;
+
+export const shortName = () =>
+	`Укажите короткое имя для нового рекламного поста`;
+export const adsData = (ads: Partial<IAdsData>) => `
+SHortName: ${ads.shortName}\n
+Укажите текст рекламного поста в разметке MARKDOWN`;
+
+export const adsButton = (ads: Partial<IAdsData>) => `
+SHortName: ${ads.shortName}\n
+Укажите текст inline кнопки, если кнопка не нужна - отправьте 0`;
+
+export const adminStat = (
+	usersCount: number,
+	adminsCount: number,
+	testsCount: number,
+	subscriptionsCount: number
+) => `
+📊 **Admin Statistics**
+
+👤 **Admins**
+- **Count**: ${adminsCount}
+
+🧑‍🤝‍🧑 **Users**
+- **Count**: ${usersCount}
+
+📝 **Tests**
+- **Count**: ${testsCount}
+
+📡 **Subscriptions**
+- **Count**: ${subscriptionsCount}
+
+--------------------------------------------------
+*Generated on: ${new Date().toLocaleString()}*
+`;
+
+export const joinMessage = (channels: string[]) => {
+	const channelLinks = channels
+		.map((channel) => `<a href="https://t.me/${channel.link}">@${channel}</a>`)
+		.join(' va ');
+
+	return `
+		☝️ <b>Hurmatli foydalanuvchi,</b>
+
+		Siz ${channelLinks} kanallariga a'zo bo'lishingiz shart.  
+		A'zo bo'lmasangiz, botdan foydalana olmaysiz.  
+
+		✅ A'zo bo'lganingizdan so'ng, qayta urinib ko'ring.`;
+};
+
+export const helloMessage = `🎉 **Botimizga Xush Kelibsiz!** 🎉  
+
+✅ Siz muvaffaqiyatli tizimga kirdingiz va endi quyidagi imkoniyatlardan foydalanishingiz mumkin:  
+
+📝 **Online Testlar:**  
+Turli mavzular bo'yicha testlarni yechib, bilimlaringizni sinab ko'ring.  
+
+📊 **Natijalarni Tahlil Qilish:**  
+Test natijalaringizni ko'rib chiqib, o'z mahoratingizni oshiring.  
+
+🔗 **Foydali Kanal va Guruhlar:**  
+Bizning hamkor kanallarimizga ulanishni unutmang!  
+
+🚀 **Bilim sari birinchi qadamni qo'ying!**  
+`;

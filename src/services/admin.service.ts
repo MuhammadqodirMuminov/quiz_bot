@@ -1,5 +1,5 @@
 import { FilterQuery, Model, Types } from 'mongoose';
-import { adminSchema, IAdmin } from '../models/admin.schema';
+import { IAdmin, adminSchema } from '../models/admin.schema';
 import { IResponse } from '../types';
 
 class AdminService {
@@ -22,7 +22,10 @@ class AdminService {
 		const existUser = await this.adminModel.findOne({ chat_id: user.chat_id });
 		if (!existUser) {
 			try {
-				const newAdmin = await this.adminModel.create({ ...user, _id: new Types.ObjectId() });
+				const newAdmin = await this.adminModel.create({
+					...user,
+					_id: new Types.ObjectId(),
+				});
 				await newAdmin.save();
 				return { data: newAdmin };
 			} catch (error: any) {
@@ -54,6 +57,11 @@ class AdminService {
 			return { success: true };
 		}
 		return { success: false };
+	}
+
+	async getAllAdmins(filterQuery: FilterQuery<IAdmin>): Promise<IAdmin[]> {
+		const admins = await this.adminModel.find(filterQuery);
+		return admins;
 	}
 }
 
