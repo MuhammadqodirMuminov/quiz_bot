@@ -2,6 +2,7 @@ import TelegramBot from 'node-telegram-bot-api';
 import { bot } from '../config/bot.config';
 import { ms } from '../constants';
 import subscribeService from '../services/subscribe.service';
+import testService from '../services/test.service';
 import userService from '../services/user.service';
 import { mp } from '../utils';
 
@@ -16,45 +17,54 @@ class StartModule {
 		this.bot.onText(/\/start/, async msg => {
 			const chatId = msg.chat.id;
 			let isMember: boolean | null = null;
+			try {
+				const channel = await subscribeService.getOne();
 
-			const channel = await subscribeService.getOne();
+				if (channel) {
+					for (let i = 0; i < channel.channels.length; i++) {
+						const c = channel.channels[i];
 
-			if (channel) {
-				for (let i = 0; i < channel.channels.length; i++) {
-					const c = channel.channels[i];
+						const result = await this.bot.getChatMember(`@${c}`, chatId);
 
-					const result = await this.bot.getChatMember(`@${c}`, chatId);
-
-					if (
-						result.status == 'administrator' ||
-						result.status == 'creator' ||
-						result.status == 'member'
-					) {
-						isMember = true;
-					} else {
-						await this.bot.sendMessage(
-							chatId,
-							ms.joinMessage(channel.channels),
-							{
-								reply_markup: mp.channelBtns(channel.channels),
-								parse_mode: 'HTML',
-							},
-						);
-						return;
+						if (
+							result.status == 'administrator' ||
+							result.status == 'creator' ||
+							result.status == 'member'
+						) {
+							isMember = true;
+						} else {
+							await this.bot.sendMessage(
+								chatId,
+								ms.joinMessage(channel.channels),
+								{
+									reply_markup: mp.channelBtns(
+										channel.channels,
+									),
+									parse_mode: 'HTML',
+								},
+							);
+							return;
+						}
 					}
 				}
+
+				await userService.create({
+					chat_id: chatId,
+					username: msg.chat.username,
+					date_of_join: new Date(),
+				});
+
+				await this.bot.sendMessage(chatId, ms.helloMessage, {
+					reply_markup: mp.userMenu,
+					parse_mode: 'Markdown',
+				});
+			} catch (error: any) {
+				console.log(error);
+
+				this.bot.sendMessage(chatId, `Error: ${error?.message}`, {
+					parse_mode: 'Markdown',
+				});
 			}
-
-			await userService.create({
-				chat_id: chatId,
-				username: msg.chat.username,
-				date_of_join: new Date(),
-			});
-
-			await this.bot.sendMessage(chatId, ms.helloMessage, {
-				reply_markup: mp.userMenu,
-				parse_mode: 'Markdown',
-			});
 		});
 	}
 
@@ -119,6 +129,14 @@ class StartModule {
 						show_alert: true,
 					});
 				}
+			} else if (data && data?.startsWith('results_test_')) {
+				const code = data.split('_')[2];
+				const test = await testService.getOne({ code: code, isPublished: true });
+				const results = await test
+				await this.bot.answerCallbackQuery(msg.id, {
+					text: 'Thank you for your selection!',
+					show_alert: false,
+				});
 			}
 		});
 	}

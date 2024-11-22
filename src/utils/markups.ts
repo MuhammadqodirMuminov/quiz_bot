@@ -22,17 +22,21 @@ export const testSaveMenu = {
 	one_time_keyboard: false,
 };
 
-export const testInlineButton = (
-	code: number
-): SendMessageOptions['reply_markup'] => ({
+export const testInlineButton = (code: number): SendMessageOptions['reply_markup'] => ({
 	remove_keyboard: true,
 	selective: true,
 	inline_keyboard: [
 		[{ text: 'send', callback_data: `send_test_${code}` }],
 		[
 			{
-				text: 'Complate',
+				text: '❌ delete test',
 				callback_data: `edit_test_${code}`,
+			},
+		],
+		[
+			{
+				text: 'Results ✅',
+				callback_data: `results_test_${code}`,
 			},
 		],
 	],
@@ -73,9 +77,7 @@ export const subscribeMenu: SendMessageOptions['reply_markup'] = {
 	one_time_keyboard: false,
 };
 
-export const subscribeInlineButton = (
-	username: string
-): SendMessageOptions['reply_markup'] => ({
+export const subscribeInlineButton = (username: string): SendMessageOptions['reply_markup'] => ({
 	inline_keyboard: [
 		[
 			{
@@ -97,21 +99,15 @@ export const adsMenu: SendMessageOptions['reply_markup'] = {
 	one_time_keyboard: false,
 };
 
-export const adsMedia = (
-	text: string,
-	url: string
-): SendMessageOptions['reply_markup'] => ({
+export const adsMedia = (text: string, url: string): SendMessageOptions['reply_markup'] => ({
 	inline_keyboard: [[{ text, url }]],
 });
 
 export const confirmAd: SendMessageOptions['reply_markup'] = {
-	keyboard: [[{ text: '/confirm' }, { text: '/decline' }]],
-	resize_keyboard: true,
+	keyboard: [[{ text: '/confirmAd' }, { text: '/declineAd' }]],
 };
 
-export const channelBtns = (
-	cannels: string[]
-): SendMessageOptions['reply_markup'] => {
+export const channelBtns = (cannels: string[]): SendMessageOptions['reply_markup'] => {
 	return {
 		inline_keyboard: [
 			cannels.map((c, i) => {
