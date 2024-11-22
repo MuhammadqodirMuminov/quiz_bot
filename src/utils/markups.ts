@@ -97,8 +97,16 @@ export const adsMenu: SendMessageOptions['reply_markup'] = {
 	one_time_keyboard: false,
 };
 
+export const adsMedia = (
+	text: string,
+	url: string
+): SendMessageOptions['reply_markup'] => ({
+	inline_keyboard: [[{ text, url }]],
+});
+
 export const confirmAd: SendMessageOptions['reply_markup'] = {
-	keyboard: [[{ text: '/confirmAd' }, { text: '/declineAd' }]],
+	keyboard: [[{ text: '/confirm' }, { text: '/decline' }]],
+	resize_keyboard: true,
 };
 
 export const channelBtns = (
