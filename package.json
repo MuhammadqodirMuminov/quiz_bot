@@ -15,6 +15,7 @@
     "mongoose": "^8.8.1",
     "mongoose-sequence": "^6.0.1",
     "node-telegram-bot-api": "^0.66.0",
+    "nodemon": "^3.1.7",
     "path": "^0.12.7",
     "ts-node": "^10.9.2"
   },
