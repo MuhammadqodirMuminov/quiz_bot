@@ -206,3 +206,11 @@ Bizning hamkor kanallarimizga ulanishni unutmang!
 
 🚀 **Bilim sari birinchi qadamni qo'ying!**  
 `;
+
+
+export const results = `
+💡 **Test yakunlandi!**
+🔰 **Test kodi:** 6851  
+👨 **Test qatnashchilari:** 66 ta  
+📝 **Kalitlar:** 1 - B 2 - C 3 - C 4 - D 5 - D 6 - A 7 - C 8 - D 9 - B 10 - D  
+`;

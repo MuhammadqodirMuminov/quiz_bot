@@ -1,6 +1,7 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { bot } from '../config/bot.config';
 import { ms } from '../constants';
+import resultsService from '../services/results.service';
 import subscribeService from '../services/subscribe.service';
 import testService from '../services/test.service';
 import userService from '../services/user.service';
@@ -132,10 +133,18 @@ class StartModule {
 			} else if (data && data?.startsWith('results_test_')) {
 				const code = data.split('_')[2];
 				const test = await testService.getOne({ code: code, isPublished: true });
-				const results = await test
+
 				await this.bot.answerCallbackQuery(msg.id, {
 					text: 'Thank you for your selection!',
 					show_alert: false,
+				});
+
+				const results = await resultsService.getAll({ test: { _id: test?._id } });
+
+				console.log(results);
+
+				await this.bot.sendMessage(msg.message?.chat.id!, ms.results, {
+					parse_mode: 'Markdown',
 				});
 			}
 		});
