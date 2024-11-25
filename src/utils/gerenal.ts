@@ -3,16 +3,22 @@ export function extractUniqueCode(text: string) {
 	return words.length > 1 ? words[1] : null;
 }
 
-export function extractNumberAndString(input: string): { number: number; pattern: string; rest: string } | null {
-	const match = input.match(/^(\d+)\*([a-zA-Z]+)(.*)$/);
+export function extractNumberAndString(
+  input: string
+): { number: number; pattern: string; rest: string } | null {
+  const match = input.match(/^(\d+)\*([\d+a-zA-Z]+)(.*)$/);
 
-	if (!match) return null;
+  if (!match) return null;
 
-	const number = parseInt(match[1], 10);
-	const pattern = match[2];
-	const rest = match[3];
+  const number = parseInt(match[1], 10);
+  const rawPattern = match[2];
+  const rest = match[3];
 
-	return { number, pattern, rest };
+  const normalizedPattern = rawPattern.replace(/\d+[a-zA-Z]/g, (segment) =>
+    segment.slice(-1)
+  );
+
+  return { number, pattern: normalizedPattern, rest };
 }
 
 export function countMatchingAnswers(pattern: string, answers: string): { correctMatches: number; wrongAnswers: { index: number; answer: string }[] } {

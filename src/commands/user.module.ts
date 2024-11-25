@@ -16,18 +16,20 @@ class UserModule {
 	}
 
 	checkAnswers() {
-		this.bot.onText(/\📝 Tekshirish/, async msg => {
+		this.bot.onText(/\📝 Tekshirish/, async (msg) => {
 			const chatId = msg.chat.id;
-			bot.sendMessage(chatId, ms.checkAnswers, {
-				reply_markup: { remove_keyboard: true },
-			}).then(() => {
-				this.handleResult();
-			});
+			bot
+				.sendMessage(chatId, ms.checkAnswers, {
+					reply_markup: { remove_keyboard: true },
+				})
+				.then(() => {
+					this.handleResult();
+				});
 		});
 	}
 
 	userStat() {
-		this.bot.onText(/\📊 Statistikam/, async msg => {
+		this.bot.onText(/\📊 Statistikam/, async (msg) => {
 			const chatId = msg.chat.id;
 			try {
 				const user = await userService.getOne({ chat_id: chatId });
@@ -44,11 +46,13 @@ class UserModule {
 	}
 
 	private handleResult() {
-		this.bot.once('message', async msg => {
+		this.bot.once('message', async (msg) => {
 			const chatId = msg.chat.id;
 			const answers = msg.text;
 
 			const results = extractNumberAndString(answers!);
+
+			console.log({ results });
 
 			if (results) {
 				const test = await testService.getOne({ code: results.number });
@@ -76,7 +80,10 @@ class UserModule {
 
 				const user = await userService.getOne({ chat_id: chatId });
 
-				const checkedAnswers = countMatchingAnswers(results.pattern, test.answers);
+				const checkedAnswers = countMatchingAnswers(
+					results.pattern,
+					test.answers
+				);
 
 				const existresult = await resultsService.getOne({ user: user, test });
 
@@ -85,7 +92,7 @@ class UserModule {
 						{ user: user, test: test },
 						{
 							score: checkedAnswers.correctMatches,
-						},
+						}
 					);
 				} else {
 					await resultsService.create({
@@ -104,12 +111,12 @@ class UserModule {
 						test.name,
 						checkedAnswers.correctMatches,
 						checkedAnswers.wrongAnswers.length,
-						checkedAnswers.wrongAnswers,
+						checkedAnswers.wrongAnswers
 					),
 					{
 						reply_markup: mp.userMenu,
 						parse_mode: 'Markdown',
-					},
+					}
 				);
 			} else {
 				await bot.sendMessage(chatId, ms.checkAnswers, {
@@ -120,7 +127,12 @@ class UserModule {
 		});
 	}
 
-	async sendAllUser(adminChatId: number, text: string, media: string, mediaType: string) {
+	async sendAllUser(
+		adminChatId: number,
+		text: string,
+		media: string,
+		mediaType: string
+	) {
 		const users = await userService.getAll({});
 		let sended = 0;
 		let unSended = 0;
@@ -158,10 +170,14 @@ class UserModule {
 			}
 		}
 
-		await this.bot.sendMessage(adminChatId, `Sent ${sended} \nNot Sent ${unSended}`, {
-			parse_mode: 'Markdown',
-			reply_markup: mp.adminMenu,
-		});
+		await this.bot.sendMessage(
+			adminChatId,
+			`Sent ${sended} \nNot Sent ${unSended}`,
+			{
+				parse_mode: 'Markdown',
+				reply_markup: mp.adminMenu,
+			}
+		);
 	}
 
 	init() {
