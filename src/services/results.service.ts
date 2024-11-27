@@ -1,4 +1,4 @@
-import mongoose, { FilterQuery, Model } from 'mongoose';
+import mongoose, { FilterQuery, Model, Types } from 'mongoose';
 import { IResult, resultSchema } from '../models/result.schema';
 
 class ResultService {
@@ -44,7 +44,7 @@ class ResultService {
 		const results = await this.resultModel.aggregate([
 			{
 				$match: {
-					test: new mongoose.Types.ObjectId(testId),
+					test: new Types.ObjectId(testId),
 				},
 			},
 			{
@@ -71,7 +71,7 @@ class ResultService {
 			},
 			{
 				$addFields: {
-					maxScore: { $max: '$atteps.score' },
+					maxScore: { $max : '$atteps.score' },
 				},
 			},
 			{
