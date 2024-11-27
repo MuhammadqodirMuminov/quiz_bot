@@ -14,7 +14,7 @@ class MailService {
 	}
 
 	async add_media_to_mail(messageContent: any) {
-		this.bot.once('message', async msg => {
+		this.bot.once('message', async (msg) => {
 			const chatId = msg.chat.id;
 
 			try {
@@ -29,14 +29,10 @@ class MailService {
 					messageContent['text'] = msg.text;
 
 					this.bot
-						.sendMessage(
-							chatId,
-							"Attach media - 1\nDon't attach media - 0",
-							{
-								reply_markup: mp.cancelMail,
-								parse_mode: 'Markdown',
-							},
-						)
+						.sendMessage(chatId, "Attach media - 1\nDon't attach media - 0", {
+							reply_markup: mp.cancelMail,
+							parse_mode: 'Markdown',
+						})
 						.then(() => {
 							this.mail_users_send(messageContent);
 						});
@@ -50,7 +46,7 @@ class MailService {
 	}
 
 	private async mail_users_send(messageContent: any) {
-		this.bot.once('message', async msg => {
+		this.bot.once('message', async (msg) => {
 			const chatId = msg.chat.id;
 
 			try {
@@ -90,7 +86,7 @@ class MailService {
 	}
 
 	private async confirm_mail(messageContent: any) {
-		this.bot.once('message', async msg => {
+		this.bot.once('message', async (msg) => {
 			const chatId = msg.chat.id;
 
 			try {
@@ -103,7 +99,7 @@ class MailService {
 						chatId,
 						messageContent['text'],
 						media,
-						messageContent['media_type'],
+						messageContent['media_type']
 					);
 				}
 			} catch (error: any) {
@@ -113,7 +109,7 @@ class MailService {
 	}
 
 	async handler_file(messageContent: any) {
-		this.bot.once('message', async msg => {
+		this.bot.once('message', async (msg) => {
 			const chatId = msg.chat.id;
 
 			try {
@@ -141,7 +137,7 @@ class MailService {
 							fileType: FileTypes.VIDEO,
 							fileId: videoId,
 						});
-						messageContent['media_type'] = 'mp4';
+						messageContent['media_type'] = FileTypes.VIDEO;
 					}
 
 					if (messageContent.status === 'mail') {
@@ -168,14 +164,12 @@ class MailService {
 						}
 
 						messageContent['src'] = image?.fileId;
-						bot.sendMessage(
-							chatId,
-							'Press push to send, cancel to cancel',
-							{
+						bot
+							.sendMessage(chatId, 'Press push to send, cancel to cancel', {
 								reply_markup: mp.cancelAndPushMail,
 								parse_mode: 'HTML',
-							},
-						).then(() => this.confirm_mail(messageContent));
+							})
+							.then(() => this.confirm_mail(messageContent));
 					} else {
 						console.log('Other status handling');
 					}

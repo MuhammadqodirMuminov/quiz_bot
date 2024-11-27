@@ -138,7 +138,9 @@ class UserModule {
 		for (const user of users) {
 			try {
 				if (media) {
-					if (mediaType === 'mp4') {
+					console.log({ media, mediaType });
+
+					if (mediaType === FileTypes.VIDEO) {
 						await this.bot.sendVideo(user.chat_id, media, {
 							caption: text,
 							reply_markup: mp.offMarkup,

@@ -61,7 +61,7 @@ export class TestModule {
 						const tests = await testService.getAll();
 
 						for (const test of tests) {
-							this.sendImageOrDocument(test, chatId, () => {}, {
+							await this.sendImageOrDocument(test, chatId, () => {}, {
 								parse_mode: 'Markdown',
 								reply_markup: mp.testInlineButton(test.code),
 								caption: ms.test.card(test.code, test.name, test.count),
@@ -69,7 +69,7 @@ export class TestModule {
 						}
 
 						await this.bot.sendMessage(chatId, ms.testHomeMessage, {
-							reply_markup: mp.testMenu,
+							reply_markup: mp.adminMenu,
 						});
 					}
 				} catch (error: any) {
@@ -93,7 +93,7 @@ export class TestModule {
 							chatId,
 							ms.test.card(existTest.code, existTest.name, existTest.count),
 							existTest.image.fileId!,
-							''
+							existTest.image.fileType
 						);
 					}
 				}
@@ -301,7 +301,7 @@ export class TestModule {
 		});
 	}
 
-	private sendImageOrDocument(
+	private async sendImageOrDocument(
 		existTest: ITest,
 		chatId: number,
 		cb: () => void,
@@ -309,11 +309,17 @@ export class TestModule {
 	) {
 		try {
 			if (existTest.image.fileType === FileTypes.IMAGE) {
-				this.bot.sendPhoto(chatId, existTest.image.fileId, options).then(cb);
+				await this.bot
+					.sendPhoto(chatId, existTest.image.fileId, options)
+					.then(cb);
 			} else if (existTest.image.fileType === FileTypes.DOCUMENT) {
-				this.bot.sendDocument(chatId, existTest.image.fileId, options).then(cb);
+				await this.bot
+					.sendDocument(chatId, existTest.image.fileId, options)
+					.then(cb);
 			} else if (existTest.image.fileType === FileTypes.VIDEO) {
-				this.bot.sendVideo(chatId, existTest.image.fileId, options).then(cb);
+				await this.bot
+					.sendVideo(chatId, existTest.image.fileId, options)
+					.then(cb);
 			}
 		} catch (error: any) {
 			this.bot.sendMessage(chatId, error?.message);
