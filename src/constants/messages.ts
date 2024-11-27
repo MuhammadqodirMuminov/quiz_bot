@@ -1,3 +1,4 @@
+import TelegramBot from 'node-telegram-bot-api';
 import { IResult } from '../models/result.schema';
 import { IAdsData } from '../types';
 
@@ -207,7 +208,11 @@ Bizning hamkor kanallarimizga ulanishni unutmang!
 🚀 **Bilim sari birinchi qadamni qo'ying!**  
 `;
 
-export const results = (results: IResult[], code: string) => `
+export const results = async (
+	results: IResult[],
+	code: string,
+	bot: TelegramBot
+) => `
 💡 **Test natijalari!**
 🔰 **Test kodi:** ${code}  
 👨 **Test qatnashchilari:** ${results.length} ta
@@ -215,10 +220,13 @@ export const results = (results: IResult[], code: string) => `
 	.split('')
 	.map((test, i) => `${i + 1}-${test.toUpperCase()}`)}
 
-${results.map(
-	({ user, atteps }, i) =>
-		`${i + 1}. ${user.username ? '@' : ''}${user.username} - ${
-			atteps[0].score
-		}\n`
+${await Promise.all(
+	results.map(async ({ user, atteps }, i) => {
+		const firstName = (await bot.getChat(user.chat_id)).first_name;
+
+		return `${i + 1}. ${user.username ? '@' : ''}${
+			user.username ? user.username : firstName
+		} - ${atteps[0].score}\n`;
+	})
 )}
 `;

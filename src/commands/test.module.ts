@@ -125,10 +125,14 @@ export class TestModule {
 
 					const results = await resultsService.getResults(existTest?.id!);
 
-					await this.bot.sendMessage(chatId, ms.results(results, code), {
-						parse_mode: 'Markdown',
-						reply_markup: mp.adminMenu,
-					});
+					await this.bot.sendMessage(
+						chatId,
+						await ms.results(results, code, this.bot),
+						{
+							parse_mode: 'Markdown',
+							reply_markup: mp.adminMenu,
+						}
+					);
 				}
 			}
 		});
