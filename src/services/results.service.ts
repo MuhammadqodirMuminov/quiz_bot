@@ -1,4 +1,4 @@
-import { FilterQuery, Model } from 'mongoose';
+import mongoose, { FilterQuery, Model } from 'mongoose';
 import { IResult, resultSchema } from '../models/result.schema';
 
 class ResultService {
@@ -21,7 +21,7 @@ class ResultService {
 		const result = await this.resultModel.findOne(
 			filerQuery,
 			{},
-			{ populate: ['user', 'test'] },
+			{ populate: ['user', 'test'] }
 		);
 
 		return result;
@@ -34,17 +34,70 @@ class ResultService {
 				{},
 				{
 					populate: ['user', 'test'],
-				},
+				}
 			)
 			.lean(true);
 		return results as IResult[];
+	}
+
+	async getResults(testId: string) {
+		const results = await this.resultModel.aggregate([
+			{
+				$match: {
+					test: new mongoose.Types.ObjectId(testId),
+				},
+			},
+			{
+				$lookup: {
+					from: 'users',
+					localField: 'user',
+					foreignField: '_id',
+					as: 'user',
+				},
+			},
+			{
+				$unwind: '$user',
+			},
+			{
+				$lookup: {
+					from: 'tests',
+					localField: 'test',
+					foreignField: '_id',
+					as: 'test',
+				},
+			},
+			{
+				$unwind: '$test',
+			},
+			{
+				$addFields: {
+					maxScore: { $max: '$atteps.score' },
+				},
+			},
+			{
+				$project: {
+					_id: 1,
+					user: 1,
+					test: 1,
+					atteps: {
+						$filter: {
+							input: '$atteps',
+							as: 'attep',
+							cond: { $eq: ['$$attep.score', '$maxScore'] },
+						},
+					},
+				},
+			},
+		]);
+
+		return results;
 	}
 
 	async update(filerQuery: FilterQuery<IResult>, update: { score: number }) {
 		const updateResult = await this.resultModel.findOneAndUpdate(
 			filerQuery,
 			{ $push: { atteps: update } },
-			{ new: true, populate: ['user', 'test'] },
+			{ new: true, populate: ['user', 'test'] }
 		);
 		return updateResult;
 	}

@@ -9,6 +9,7 @@ import testService from '../services/test.service';
 import { FileTypes } from '../types';
 import { mp } from '../utils';
 import userModule from './user.module';
+import resultsService from '../services/results.service';
 
 export class TestModule {
 	private bot: TelegramBot;
@@ -47,30 +48,32 @@ export class TestModule {
 
 			const { success } = await adminService.isAdmin(chatId);
 			if (success) {
-				if (text == '/create') {
-					this.bot
-						.sendMessage(chatId, ms.test.name, {
-							reply_markup: { remove_keyboard: true },
-						})
-						.then(() => {
-							this.createTest();
-						});
-				} else if (text == '/getAll') {
-					const tests = await testService.getAll();
+				try {
+					if (text == '/create') {
+						this.bot
+							.sendMessage(chatId, ms.test.name, {
+								reply_markup: { remove_keyboard: true },
+							})
+							.then(() => {
+								this.createTest();
+							});
+					} else if (text == '/getAll') {
+						const tests = await testService.getAll();
 
-					await Promise.all(
-						tests.map(async (test) => {
+						for (const test of tests) {
 							this.sendImageOrDocument(test, chatId, () => {}, {
 								parse_mode: 'Markdown',
 								reply_markup: mp.testInlineButton(test.code),
 								caption: ms.test.card(test.code, test.name, test.count),
 							});
-						})
-					);
+						}
 
-					await this.bot.sendMessage(chatId, ms.testHomeMessage, {
-						reply_markup: mp.testMenu,
-					});
+						await this.bot.sendMessage(chatId, ms.testHomeMessage, {
+							reply_markup: mp.testMenu,
+						});
+					}
+				} catch (error: any) {
+					this.bot.sendMessage(chatId, error?.message);
 				}
 			}
 		});
@@ -112,6 +115,20 @@ export class TestModule {
 							}
 						);
 					}
+				}
+				if (data && data.startsWith('results_test_')) {
+					const code = data.split('_')[2];
+					const existTest = await testService.getOne({
+						code: code,
+						isPublished: true,
+					});
+
+					const results = await resultsService.getResults(existTest?.id!);
+					console.log(results[0]!);
+
+					console.log('*******************');
+					console.log(results);
+					this.bot.sendMessage(chatId, ms.results(results, code));
 				}
 			}
 		});
@@ -280,10 +297,16 @@ export class TestModule {
 		cb: () => void,
 		options: TelegramBot.SendPhotoOptions
 	) {
-		if (existTest.image.fileType === FileTypes.IMAGE) {
-			this.bot.sendPhoto(chatId, existTest.image.fileId, options).then(cb);
-		} else if (existTest.image.fileType === FileTypes.DOCUMENT) {
-			this.bot.sendDocument(chatId, existTest.image.fileId, options).then(cb);
+		try {
+			if (existTest.image.fileType === FileTypes.IMAGE) {
+				this.bot.sendPhoto(chatId, existTest.image.fileId, options).then(cb);
+			} else if (existTest.image.fileType === FileTypes.DOCUMENT) {
+				this.bot.sendDocument(chatId, existTest.image.fileId, options).then(cb);
+			} else if (existTest.image.fileType === FileTypes.VIDEO) {
+				this.bot.sendVideo(chatId, existTest.image.fileId, options).then(cb);
+			}
+		} catch (error: any) {
+			this.bot.sendMessage(chatId, error?.message);
 		}
 	}
 

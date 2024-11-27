@@ -207,10 +207,18 @@ Bizning hamkor kanallarimizga ulanishni unutmang!
 🚀 **Bilim sari birinchi qadamni qo'ying!**  
 `;
 
+export const results = (results: IResult[], code: string) => `
+💡 **Test natijalari!**
+🔰 **Test kodi:** ${code}  
+👨 **Test qatnashchilari:** ${results.length} ta
+📝 **Kalitlar:** ${results[0].test.answers
+	.split('')
+	.map((test, i) => `${i + 1}-${test.toUpperCase()}`)}
 
-export const results = `
-💡 **Test yakunlandi!**
-🔰 **Test kodi:** 6851  
-👨 **Test qatnashchilari:** 66 ta  
-📝 **Kalitlar:** 1 - B 2 - C 3 - C 4 - D 5 - D 6 - A 7 - C 8 - D 9 - B 10 - D  
+${results.map(
+	({ user, atteps }, i) =>
+		`${i + 1}. ${user.username ? '@' : ''}${user.username} - ${
+			atteps[0].score
+		}\n`
+)}
 `;

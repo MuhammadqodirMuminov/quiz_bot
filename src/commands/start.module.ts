@@ -15,7 +15,7 @@ class StartModule {
 	}
 
 	private start() {
-		this.bot.onText(/\/start/, async msg => {
+		this.bot.onText(/\/start/, async (msg) => {
 			const chatId = msg.chat.id;
 			let isMember: boolean | null = null;
 			try {
@@ -38,11 +38,9 @@ class StartModule {
 								chatId,
 								ms.joinMessage(channel.channels),
 								{
-									reply_markup: mp.channelBtns(
-										channel.channels,
-									),
+									reply_markup: mp.channelBtns(channel.channels),
 									parse_mode: 'HTML',
-								},
+								}
 							);
 							return;
 						}
@@ -78,7 +76,7 @@ class StartModule {
 	}
 
 	async callbackQuery() {
-		this.bot.on('callback_query', async msg => {
+		this.bot.on('callback_query', async (msg) => {
 			let isMember: boolean | null = null;
 			const chatId = msg.message?.chat.id;
 			const data = msg.data;
@@ -102,11 +100,9 @@ class StartModule {
 								chatId!,
 								ms.joinMessage(channel.channels),
 								{
-									reply_markup: mp.channelBtns(
-										channel.channels,
-									),
+									reply_markup: mp.channelBtns(channel.channels),
 									parse_mode: 'HTML',
-								},
+								}
 							);
 							return;
 						}
@@ -130,23 +126,28 @@ class StartModule {
 						show_alert: true,
 					});
 				}
-			} else if (data && data?.startsWith('results_test_')) {
-				const code = data.split('_')[2];
-				const test = await testService.getOne({ code: code, isPublished: true });
-
-				await this.bot.answerCallbackQuery(msg.id, {
-					text: 'Thank you for your selection!',
-					show_alert: false,
-				});
-
-				const results = await resultsService.getAll({ test: { _id: test?._id } });
-
-				console.log(results);
-
-				await this.bot.sendMessage(msg.message?.chat.id!, ms.results, {
-					parse_mode: 'Markdown',
-				});
 			}
+			//  else if (data && data?.startsWith('results_test_')) {
+			// 	const code = data.split('_')[2];
+			// 	const test = await testService.getOne({
+			// 		code: code,
+			// 		isPublished: true,
+			// 	});
+
+			// 	const results = await resultsService.getAll({
+			// 		test: { _id: test?._id },
+			// 	});
+
+			// 	console.log(results);
+			// 	await this.bot.answerCallbackQuery(msg.id, {
+			// 		text: 'Thank you for your selection!',
+			// 		show_alert: false,
+			// 	});
+
+			// 	await this.bot.sendMessage(msg.message?.chat.id!, ms.results, {
+			// 		parse_mode: 'Markdown',
+			// 	});
+			// }
 		});
 	}
 

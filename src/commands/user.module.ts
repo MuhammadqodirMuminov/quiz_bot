@@ -52,8 +52,6 @@ class UserModule {
 
 			const results = extractNumberAndString(answers!);
 
-			console.log({ results });
-
 			if (results) {
 				const test = await testService.getOne({ code: results.number });
 
