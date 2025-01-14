@@ -4,8 +4,7 @@ import { IAdsData } from '../types';
 
 export const notAdmin = 'account is not admin';
 
-export const mailUsersMsg =
-	'Write text in the MARKDOWN markup or click cancel_mail';
+export const mailUsersMsg = 'Write text in the MARKDOWN markup or click cancel_mail';
 
 // export const
 export const testHomeMessage = `Choose your test or create new One!`;
@@ -68,7 +67,7 @@ export const testResult = (
 	testNomi: string,
 	trueAnswersCount: number,
 	falseAnswersCount: number,
-	falseAnswers: { index: number; answer: string }[]
+	falseAnswers: { index: number; answer: string }[],
 ): string => {
 	return `
 # Test Result for "${testNomi}"
@@ -80,9 +79,7 @@ export const testResult = (
 ${
 	falseAnswers.length > 0
 		? falseAnswers
-				.map(
-					(fa) => `- **Question ${fa.index + 1}**:  True answer: ${fa.answer}`
-				)
+				.map(fa => `- **Question ${fa.index + 1}**:  True answer: ${fa.answer}`)
 				.join('\n')
 		: 'No incorrect answers!'
 }
@@ -103,7 +100,7 @@ export const ads = {
 export const userStats = (results: IResult[]): string => `
 ✨ **Sizning Test Statistikalaringiz:**
 ${results
-	.map((result) => {
+	.map(result => {
 		return `
 📝 **Test Ma'lumotlari**:
   - **Test Nomi**: ${result.test.name}
@@ -125,13 +122,11 @@ ${
 🌟 **Mehnatingizni qadrlaymiz!**
 `;
 
-export const adminStatus = (status: boolean): string =>
-	`Выберите действие\n\nstatus: ${status}`;
+export const adminStatus = (status: boolean): string => `Выберите действие\n\nstatus: ${status}`;
 
 export const adsOnMessage = (status: boolean) => `Реклама включена : ${status}`;
 
-export const shortName = () =>
-	`Укажите короткое имя для нового рекламного поста`;
+export const shortName = () => `Укажите короткое имя для нового рекламного поста`;
 
 export const adsData = (ads: Partial<IAdsData>) => `
 SHortName: ${ads.shortName}\n
@@ -158,7 +153,7 @@ export const adminStat = (
 	usersCount: number,
 	adminsCount: number,
 	testsCount: number,
-	subscriptionsCount: number
+	subscriptionsCount: number,
 ) => `
 📊 **Admin Statistics**
 
@@ -180,7 +175,7 @@ export const adminStat = (
 
 export const joinMessage = (channels: string[]) => {
 	const channelLinks = channels
-		.map((channel) => `<a href="https://t.me/${channel.link}">@${channel}</a>`)
+		.map(channel => `<a href="https://t.me/${channel.link}">@${channel}</a>`)
 		.join(' va ');
 
 	return `
@@ -208,17 +203,15 @@ Bizning hamkor kanallarimizga ulanishni unutmang!
 🚀 **Bilim sari birinchi qadamni qo'ying!**  
 `;
 
-export const results = async (
-	results: IResult[],
-	code: string,
-	bot: TelegramBot
-) => `
+export const results = async (results: IResult[], code: string, bot: TelegramBot) => `
 💡 **Test natijalari!**
 🔰 **Test kodi:** ${code}  
 👨 **Test qatnashchilari:** ${results.length} ta
-📝 **Kalitlar:** ${results[0].test.answers
-	.split('')
-	.map((test, i) => `${i + 1}-${test.toUpperCase()}`)}
+📝 **Kalitlar:** ${
+	results[0]
+		? results[0].test.answers.split('').map((test, i) => `${i + 1}-${test.toUpperCase()}`)
+		: '-'
+}
 
 ${await Promise.all(
 	results.map(async ({ user, atteps }, i) => {
@@ -227,6 +220,29 @@ ${await Promise.all(
 		return `${i + 1}. ${user.username ? '@' : ''}${
 			user.username ? user.username : firstName
 		} - ${atteps[0].score}\n`;
-	})
+	}),
 )}
+`;
+
+export const existTestResult = (results: IResult): string => `
+	📪 Allaqachon testni yechib bo'lgansiz!!
+
+	📊 Natijalar :
+
+	
+	
+📝 **Test Ma'lumotlari**:
+  - **Test Nomi**: ${results.test.name}
+  - **Test Kodi**: ${results.test.code}
+
+🎯 **Urinishlar Tarixi**:
+${
+	results?.atteps
+		?.map((a, i) => {
+			return `    ${i + 1}. **Ball**: ${a.score} ✅  |  **Urush #${i + 1}**`;
+		})
+		.join('\n') || "    Hali urinishlar yo'q 🚫"
+}
+
+📊 **Davom eting!** Ko'proq testlar topshiring va ko'nikmalaringizni oshiring! 🔥  
 `;

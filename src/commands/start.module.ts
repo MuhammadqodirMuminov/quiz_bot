@@ -1,9 +1,7 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { bot } from '../config/bot.config';
 import { ms } from '../constants';
-import resultsService from '../services/results.service';
 import subscribeService from '../services/subscribe.service';
-import testService from '../services/test.service';
 import userService from '../services/user.service';
 import { mp } from '../utils';
 
@@ -15,7 +13,7 @@ class StartModule {
 	}
 
 	private start() {
-		this.bot.onText(/\/start/, async (msg) => {
+		this.bot.onText(/\/start/, async msg => {
 			const chatId = msg.chat.id;
 			let isMember: boolean | null = null;
 			try {
@@ -38,9 +36,11 @@ class StartModule {
 								chatId,
 								ms.joinMessage(channel.channels),
 								{
-									reply_markup: mp.channelBtns(channel.channels),
+									reply_markup: mp.channelBtns(
+										channel.channels,
+									),
 									parse_mode: 'HTML',
-								}
+								},
 							);
 							return;
 						}
@@ -76,7 +76,7 @@ class StartModule {
 	}
 
 	async callbackQuery() {
-		this.bot.on('callback_query', async (msg) => {
+		this.bot.on('callback_query', async msg => {
 			let isMember: boolean | null = null;
 			const chatId = msg.message?.chat.id;
 			const data = msg.data;
@@ -100,9 +100,11 @@ class StartModule {
 								chatId!,
 								ms.joinMessage(channel.channels),
 								{
-									reply_markup: mp.channelBtns(channel.channels),
+									reply_markup: mp.channelBtns(
+										channel.channels,
+									),
 									parse_mode: 'HTML',
-								}
+								},
 							);
 							return;
 						}

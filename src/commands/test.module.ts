@@ -18,14 +18,14 @@ export class TestModule {
 	}
 
 	private test() {
-		this.bot.onText(/\/test/, async (msg) => {
+		this.bot.onText(/\/test/, async msg => {
 			const chatId = msg.chat.id;
 
 			try {
 				const { success } = await adminService.isAdmin(chatId);
 
 				if (success) {
-					this.testOptions(chatId).then((_) => {
+					this.testOptions(chatId).then(_ => {
 						this.handleName();
 					});
 				} else {
@@ -42,7 +42,7 @@ export class TestModule {
 	}
 
 	private async handleName() {
-		this.bot.once('message', async (msg) => {
+		this.bot.once('message', async msg => {
 			const chatId = msg.chat.id;
 			const text = msg.text?.trim();
 
@@ -64,7 +64,11 @@ export class TestModule {
 							await this.sendImageOrDocument(test, chatId, () => {}, {
 								parse_mode: 'Markdown',
 								reply_markup: mp.testInlineButton(test.code),
-								caption: ms.test.card(test.code, test.name, test.count),
+								caption: ms.test.card(
+									test.code,
+									test.name,
+									test.count,
+								),
 							});
 						}
 
@@ -80,7 +84,7 @@ export class TestModule {
 	}
 
 	async sendTest() {
-		this.bot.on('callback_query', async (msg) => {
+		this.bot.on('callback_query', async msg => {
 			const data = msg.data;
 			const chatId = msg.message?.chat.id;
 			if (data && chatId) {
@@ -91,9 +95,13 @@ export class TestModule {
 					if (existTest) {
 						userModule.sendAllUser(
 							chatId,
-							ms.test.card(existTest.code, existTest.name, existTest.count),
+							ms.test.card(
+								existTest.code,
+								existTest.name,
+								existTest.count,
+							),
 							existTest.image.fileId!,
-							existTest.image.fileType
+							existTest.image.fileType,
 						);
 					}
 				}
@@ -112,7 +120,7 @@ export class TestModule {
 							`Test code: <code>${existTest.code}</code>\n<p>Test successfully deleted!</p>`,
 							{
 								parse_mode: 'HTML',
-							}
+							},
 						);
 					}
 				}
@@ -131,7 +139,7 @@ export class TestModule {
 						{
 							parse_mode: 'Markdown',
 							reply_markup: mp.adminMenu,
-						}
+						},
 					);
 				}
 			}
@@ -139,7 +147,7 @@ export class TestModule {
 	}
 
 	private async createTest() {
-		this.bot.once('message', async (msg) => {
+		this.bot.once('message', async msg => {
 			const chatId = msg.chat.id;
 			const name = msg.text;
 
@@ -154,7 +162,7 @@ export class TestModule {
 	}
 
 	private handleText(code: number) {
-		this.bot.once('message', async (msg) => {
+		this.bot.once('message', async msg => {
 			const chatId = msg.chat.id;
 			const text = msg.text;
 
@@ -175,7 +183,7 @@ export class TestModule {
 	}
 
 	private handleImage(code: number) {
-		this.bot.once('message', async (msg) => {
+		this.bot.once('message', async msg => {
 			let image: IFile | undefined = undefined;
 			const chatId = msg.chat.id;
 			const fileId = msg.photo?.at(-1)?.file_id;
@@ -216,7 +224,7 @@ export class TestModule {
 	}
 
 	private handleAnswers(code: number) {
-		this.bot.once('message', async (msg) => {
+		this.bot.once('message', async msg => {
 			const chatId = msg.chat.id;
 
 			const answers = msg.text?.trim().toLowerCase();
@@ -241,11 +249,11 @@ export class TestModule {
 							caption: ms.test.card(
 								existTest.code,
 								existTest.name,
-								existTest.count
+								existTest.count,
 							),
 							parse_mode: 'Markdown',
 							reply_markup: mp.testSaveMenu,
-						}
+						},
 					);
 				}
 			}
@@ -253,7 +261,7 @@ export class TestModule {
 	}
 
 	private handleSave(code: number) {
-		this.bot.once('message', async (msg) => {
+		this.bot.once('message', async msg => {
 			const chatId = msg.chat.id;
 			const text = msg.text?.trim();
 
@@ -268,7 +276,7 @@ export class TestModule {
 							caption: ms.test.card(
 								existTest.code,
 								existTest.name,
-								existTest.count
+								existTest.count,
 							),
 							parse_mode: 'Markdown',
 							reply_markup: mp.adminMenu,
@@ -279,16 +287,20 @@ export class TestModule {
 							caption: ms.test.card(
 								existTest.code,
 								existTest.name,
-								existTest.count
+								existTest.count,
 							),
 							parse_mode: 'Markdown',
 							reply_markup: mp.adminMenu,
 						});
 						userModule.sendAllUser(
 							chatId,
-							ms.test.card(existTest.code, existTest.name, existTest.count),
+							ms.test.card(
+								existTest.code,
+								existTest.name,
+								existTest.count,
+							),
 							existTest.image.fileId!,
-							''
+							'',
 						);
 					} else {
 						this.bot.sendMessage(chatId, 'Invalid command', {
@@ -305,21 +317,17 @@ export class TestModule {
 		existTest: ITest,
 		chatId: number,
 		cb: () => void,
-		options: TelegramBot.SendPhotoOptions
+		options: TelegramBot.SendPhotoOptions,
 	) {
 		try {
 			if (existTest.image.fileType === FileTypes.IMAGE) {
-				await this.bot
-					.sendPhoto(chatId, existTest.image.fileId, options)
-					.then(cb);
+				await this.bot.sendPhoto(chatId, existTest.image.fileId, options).then(cb);
 			} else if (existTest.image.fileType === FileTypes.DOCUMENT) {
 				await this.bot
 					.sendDocument(chatId, existTest.image.fileId, options)
 					.then(cb);
 			} else if (existTest.image.fileType === FileTypes.VIDEO) {
-				await this.bot
-					.sendVideo(chatId, existTest.image.fileId, options)
-					.then(cb);
+				await this.bot.sendVideo(chatId, existTest.image.fileId, options).then(cb);
 			}
 		} catch (error: any) {
 			this.bot.sendMessage(chatId, error?.message);
